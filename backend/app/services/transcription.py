@@ -17,7 +17,7 @@ async def transcribe_audio(file_path: str, language: str = None) -> str:
         # Upload the audio file
         audio_file = genai.upload_file(file_path)
         
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         
         prompt = "Transcribe this audio accurately. Return ONLY the transcription text, nothing else."
         if language:

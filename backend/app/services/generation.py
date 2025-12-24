@@ -76,7 +76,7 @@ async def generate_social_posts(analyzed_data: dict, text: str, platforms: List[
     clean_text = remove_filler_words(text)
     
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         
         system_prompt = build_system_prompt(platforms, emotion, language)
         
