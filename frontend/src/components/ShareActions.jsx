@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaLinkedin, FaXTwitter, FaWhatsapp, FaRegCopy } from 'react-icons/fa6';
 
-const ShareActions = ({ textToShare, url = "https://ghostnotepro.com" }) => {
+const ShareActions = ({ textToShare, analysisResult, url = "https://ghostnotepro.com" }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -15,26 +15,52 @@ const ShareActions = ({ textToShare, url = "https://ghostnotepro.com" }) => {
     };
 
     const handleLinkedIn = async () => {
-        // 1. Copy text to clipboard
-        await navigator.clipboard.writeText(textToShare);
+        try {
+            // 1. Copy text to clipboard (use the detailed LinkedIn strategy)
+            const linkedInContent = analysisResult?.social_content?.linkedin_post || textToShare;
+            await navigator.clipboard.writeText(linkedInContent);
 
-        // 2. Alert user
-        alert("Text Copied! Paste it into your LinkedIn post.");
+            // 2. Alert user
+            alert("LinkedIn Draft Copied! Paste it into your post.");
 
-        // 3. Open LinkedIn share (just the main feed or share dialog)
-        // Since we can't pre-fill text reliably on LinkedIn anymore without API,
-        // we just open standard share or feed.
-        window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank');
+            // 3. Open LinkedIn share 
+            window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank');
+        } catch (err) {
+            console.error('LinkedIn copy failed:', err);
+            // Fallback
+            window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(textToShare)}`, '_blank');
+        }
     };
 
     const handleX = () => {
-        const text = encodeURIComponent("Built my strategy with GhostNote Pro. ");
-        const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
+        let content = analysisResult?.social_content?.twitter_post;
+
+        // Fallback if AI didn't generate specific twitter content
+        if (!content) {
+            content = analysisResult?.viral_tweet;
+        }
+
+        // Final fallback: Summarize the strategy (first 150 chars)
+        if (!content && textToShare) {
+            content = textToShare.substring(0, 150) + "...";
+        }
+
+        // Ensure we have something
+        const shareText = content || "Built my strategy with GhostNote Pro.";
+        const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`;
         window.open(shareUrl, '_blank');
     };
 
     const handleWhatsApp = () => {
-        const text = encodeURIComponent(`Built my strategy with GhostNote Pro. Check it out: ${url}`);
+        let content = analysisResult?.social_content?.whatsapp_msg;
+
+        // Fallback
+        if (!content && textToShare) {
+            content = "Hey team, here's a strategy summary: " + textToShare.substring(0, 200) + "...";
+        }
+
+        const shareText = content || "Built my strategy with GhostNote Pro.";
+        const text = encodeURIComponent(`${shareText} ${url}`);
         window.open(`https://wa.me/?text=${text}`, '_blank');
     };
 

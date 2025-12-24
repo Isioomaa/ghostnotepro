@@ -95,8 +95,8 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 py-4 text-sm font-medium uppercase tracking-widest transition-all ${activeTab === tab.id
-                                    ? 'bg-[#F9F7F5] text-[#A88E65] border-b-2 border-[#A88E65]'
-                                    : 'bg-white text-[#999] hover:text-[#1A1A1A]'
+                                ? 'bg-[#F9F7F5] text-[#A88E65] border-b-2 border-[#A88E65]'
+                                : 'bg-white text-[#999] hover:text-[#1A1A1A]'
                                 }`}
                         >
                             {tab.label}
@@ -130,7 +130,11 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
             </div>
 
             {/* Share Actions */}
-            <ShareActions textToShare={getTextToShare()} url={window.location.href} />
+            <ShareActions
+                textToShare={getTextToShare()}
+                analysisResult={data}
+                url={window.location.href}
+            />
         </div>
     );
 };
