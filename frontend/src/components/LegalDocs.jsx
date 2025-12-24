@@ -27,7 +27,7 @@ export const PrivacyPolicy = ({ onClose }) => (
     <LegalContainer title="Privacy Policy" onClose={onClose}>
         <section>
             <h3 className="text-[#A88E65] font-serif mb-2 uppercase text-xs tracking-widest">1. Data Collection</h3>
-            <p>We collect minimal data (audio, usage metrics). Payments are processed by LemonSqueezy.</p>
+            <p>We collect minimal data (audio, usage metrics). Payments are processed by Paystack.</p>
         </section>
         <section>
             <h3 className="text-[#A88E65] font-serif mb-2 uppercase text-xs tracking-widest">2. Usage</h3>
@@ -39,7 +39,7 @@ export const PrivacyPolicy = ({ onClose }) => (
         </section>
         <section>
             <h3 className="text-[#A88E65] font-serif mb-2 uppercase text-xs tracking-widest">4. Contact</h3>
-            <p>isiomaochei44@gmail.com</p>
+            <p>ghostnotepro.team@gmail.com</p>
         </section>
     </LegalContainer>
 );
@@ -52,7 +52,7 @@ export const TermsOfService = ({ onClose }) => (
         </section>
         <section>
             <h3 className="text-[#A88E65] font-serif mb-2 uppercase text-xs tracking-widest">2. Subscription</h3>
-            <p>Cost is $20/month via LemonSqueezy.</p>
+            <p>Cost is $20/month via Paystack.</p>
         </section>
         <section>
             <h3 className="text-[#A88E65] font-serif mb-2 uppercase text-xs tracking-widest">3. Cancellation</h3>
