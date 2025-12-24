@@ -65,22 +65,20 @@ OUTPUT FORMAT:
 Return a strictly valid JSON object with exactly these four keys:
 
 1. "strategy": (String, Markdown) 
-   - A detailed strategic analysis of the user's thoughts. 
-   - Use H2 (##) for main sections.
-   - Synthesize the core insights, unique angles, and high-level vision. 
-   - Tone: Visionary, decisive, analytical.
+   - Style: Narrative, thoughtful, high-level reasoning.
+   - Tone: Consultant/Strategist. Use paragraphs, rhetorical framing, and "first principles" thinking.
+   - Goal: Explain *why* this matters. Synthesize core insights and unique angles.
 
 2. "email_draft": (String, Markdown)
-   - A delegation email written FROM the user TO their team.
-   - Subject line included as the first line (bolded).
-   - Summarize the strategy and give clear marching orders.
-   - Tone: Authoritative, clear, trusting but firm.
+   - Style: Short, punchy, human. NO corporate fluff.
+   - Tone: Busy CEO to trusted team. Direct and motivational.
+   - Format: Subject line included as first line (bolded). 3-4 sentences max, followed by a clear "Go execute" closing.
 
 3. "action_plan": (String, Markdown)
-   - A crisp, bulleted list of tactical next steps.
-   - Group by category if needed.
-   - Assign owners/deadlines placeholders (e.g., [Owner], [Date]) if not specified.
+   - Style: Clinical, rigid, high-density.
    - Tone: purely tactical and execution-focused.
+   - Format: Strictly bulleted.
+   - Requirement: Every bullet MUST include: [Task] + [Owner] + [Deadline] + [KPI/Metric].
 
 4. "clarifying_questions": (Array of Strings)
    - An array of exactly 3 strategic questions.
