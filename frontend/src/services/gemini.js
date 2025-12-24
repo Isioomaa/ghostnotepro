@@ -85,6 +85,11 @@ Return a strictly valid JSON object with exactly these four keys:
    - Identify missing context, risks, budget issues, or timeline gaps that the user forgot to mention.
    - These should be sharp, specific questions that a Chief of Staff would ask to protect the executive.
 
+5. "social_content": (Object)
+    - "twitter_post": (String) Punchy, viral summary under 200 characters. NO HASHTAGS. Optimization: Engagement.
+    - "linkedin_post": (String) Professional, structured reflection (150-200 words). Use bullet points and "Thought Leadership" tone. Optimization: Authority.
+    - "whatsapp_msg": (String) Direct, conversational summary. "Hey team, here is the breakdown: [Core Insight]. Let's discuss." Optimization: Clarity.
+
 CRITICAL RULES:
 1. Do NOT chat. Do NOT say "Here is your analysis". Just return the JSON.
 2. Ensure the JSON is valid. Escape quotes within strings properly.

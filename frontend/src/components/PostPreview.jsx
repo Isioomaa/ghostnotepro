@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
-import { generatePosts as generatePostsService } from '../services/gemini';
+import { generateExecutiveSuite } from '../services/gemini';
 import { FaLinkedin, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
 
 const PostPreview = ({ text, analysis, selectedPlatforms = ['twitter', 'linkedin'], t, languageName, onReset }) => {
@@ -36,13 +36,18 @@ const PostPreview = ({ text, analysis, selectedPlatforms = ['twitter', 'linkedin
         setLoading(true);
         setError(null);
         try {
-            // Client-side generation using Gemini
-            const data = await generatePostsService(text, analysis, selectedPlatforms, languageName);
+            // Client-side generation using Gemini Executive Suite
+            const data = await generateExecutiveSuite(text, analysis, languageName);
             setGeneratedPosts(data);
+
+            // Map the new social_content structure to our platforms
             const initialPosts = {};
-            selectedPlatforms.forEach(p => {
-                initialPosts[p] = data[p]?.content || "The signal was lost. Please try transmuting again.";
-            });
+            if (data.social_content) {
+                initialPosts.twitter = data.social_content.twitter_post;
+                initialPosts.linkedin = data.social_content.linkedin_post;
+                initialPosts.whatsapp = data.social_content.whatsapp_msg;
+            }
+
             setEditedPosts(initialPosts);
             // Trigger fade in after a small delay
             setTimeout(() => setShowResults(true), 100);
@@ -62,10 +67,18 @@ const PostPreview = ({ text, analysis, selectedPlatforms = ['twitter', 'linkedin
     const regenerateSingle = async (platform) => {
         setLoading(true);
         try {
-            // Client-side generation (variation) using Gemini
-            const data = await generatePostsService(text, analysis, [platform], languageName, true);
-            if (data[platform]?.content) {
-                setEditedPosts(prev => ({ ...prev, [platform]: data[platform].content }));
+            // Client-side generation (variation)
+            const data = await generateExecutiveSuite(text, analysis, languageName, true);
+            if (data.social_content) {
+                let newContent;
+                switch (platform) {
+                    case 'twitter': newContent = data.social_content.twitter_post; break;
+                    case 'linkedin': newContent = data.social_content.linkedin_post; break;
+                    case 'whatsapp': newContent = data.social_content.whatsapp_msg; break;
+                }
+                if (newContent) {
+                    setEditedPosts(prev => ({ ...prev, [platform]: newContent }));
+                }
             }
         } catch (err) {
             console.error(err);
@@ -156,23 +169,39 @@ const PostPreview = ({ text, analysis, selectedPlatforms = ['twitter', 'linkedin
     const platformConfig = {
         twitter: { name: 'X', maxLength: 280 },
         linkedin: { name: 'LinkedIn', maxLength: 3000 },
+        whatsapp: { name: 'WhatsApp', maxLength: 1000 },
     };
 
-    const handleShare = (destination, content) => {
-        const watermark = "\n\n— Transmuted by GhostNote Pro";
-        const text = encodeURIComponent(content + watermark);
-        const url = encodeURIComponent(window.location.href);
+    const handleShare = async (destination, content) => {
+        // Platform Native Sharing Logic (LinkedIn Blocker Fix)
+        if (destination === 'linkedin') {
+            try {
+                // 1. Copy to Clipboard
+                await navigator.clipboard.writeText(content);
 
+                // 2. Alert/Toast
+                alert("LinkedIn Draft Copied! Paste it into your post.");
+
+                // 3. Open LinkedIn Feed
+                window.open('https://www.linkedin.com/feed/', '_blank');
+            } catch (err) {
+                console.error('Clipboard failed', err);
+                // Fallback
+                const text = encodeURIComponent(content);
+                window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${text}`, '_blank');
+            }
+            return;
+        }
+
+        const encodedContent = encodeURIComponent(content);
         let shareUrl = '';
+
         switch (destination) {
-            case 'linkedin':
-                shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${text}`;
-                break;
             case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+                shareUrl = `https://twitter.com/intent/tweet?text=${encodedContent}`;
                 break;
             case 'whatsapp':
-                shareUrl = `https://wa.me/?text=${text}`;
+                shareUrl = `https://wa.me/?text=${encodedContent}`;
                 break;
         }
 
