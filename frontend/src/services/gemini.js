@@ -62,7 +62,7 @@ LANGUAGE REQUIREMENT:
 - Use professional, high-status idiom appropriate for ${language} business contexts.
 
 OUTPUT FORMAT:
-Return a strictly valid JSON object with exactly these six keys:
+Return a strictly valid JSON object with exactly these seven keys:
 
 1. "interpreted_context": (String)
    - A 1-sentence meta-summary of the user's intent and topic.
@@ -76,25 +76,32 @@ Return a strictly valid JSON object with exactly these six keys:
    - Example: ["Retention leak", "Q1 Deadline", "Budget constraints", "Team expansion"]
    - Keep each item short (1-3 words maximum).
 
-3. "strategy": (String, Markdown) 
+3. "confidence_analysis": (Object)
+   - Assess your confidence in understanding the audio and context.
+   - "level": (String) Must be exactly one of: "High", "Medium", or "Low"
+   - "reason": (String) If level is not "High", explain why (e.g., "Audio quality was unclear", "Acronym 'ADS' was undefined", "Multiple interpretations possible")
+   - "clarification_question": (String) If ambiguity exists, ask a specific question to resolve it (e.g., "Did you mean 'Ads' (advertising) or 'A.D.S.' (the system)?")
+   - If level is "High", set reason and clarification_question to empty strings.
+
+4. "strategy": (String, Markdown) 
    - A detailed strategic analysis of the user's thoughts. 
    - Use H2 (##) for main sections.
    - Synthesize the core insights, unique angles, and high-level vision. 
    - Tone: Visionary, decisive, analytical.
 
-4. "email_draft": (String, Markdown)
+5. "email_draft": (String, Markdown)
    - A delegation email written FROM the user TO their team.
    - Subject line included as the first line (bolded).
    - Summarize the strategy and give clear marching orders.
    - Tone: Authoritative, clear, trusting but firm.
 
-5. "action_plan": (String, Markdown)
+6. "action_plan": (String, Markdown)
    - A crisp, bulleted list of tactical next steps.
    - Group by category if needed.
    - Assign owners/deadlines placeholders (e.g., [Owner], [Date]) if not specified.
    - Tone: purely tactical and execution-focused.
 
-6. "clarifying_questions": (Array of Strings)
+7. "clarifying_questions": (Array of Strings)
    - An array of exactly 3 strategic questions.
    - Identify missing context, risks, budget issues, or timeline gaps that the user forgot to mention.
    - These should be sharp, specific questions that a Chief of Staff would ask to protect the executive.
@@ -105,6 +112,7 @@ CRITICAL RULES:
 3. The "clarifying_questions" MUST be an array of strings, not a single string.
 4. The "interpreted_context" MUST be generated first and be a single concise sentence.
 5. The "thought_trace" MUST be an array of 3-5 short keyword strings.
+6. The "confidence_analysis.level" MUST be exactly "High", "Medium", or "Low" (case-sensitive).
 `;
 };
 

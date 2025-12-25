@@ -72,7 +72,7 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
 
     return (
         <div className="card-container fade-in">
-            {/* New Session Button */}
+            {/* New Session Button and Confidence Badge */}
             <div className="mb-6 flex justify-between items-center">
                 <button
                     onClick={onReset}
@@ -83,10 +83,42 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                     </svg>
                     <span>New Session</span>
                 </button>
+
+                {/* Confidence Badge */}
+                {data.confidence_analysis && (
+                    <div className="relative group">
+                        {data.confidence_analysis.level === 'High' ? (
+                            <div className="flex items-center space-x-2 bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded-full text-xs font-medium">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span>High Confidence</span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex items-center space-x-2 bg-yellow-50 border border-yellow-300 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-medium cursor-help">
+                                    <span>⚠️</span>
+                                    <span>Potential Ambiguity</span>
+                                </div>
+                                {/* Tooltip */}
+                                {data.confidence_analysis.clarification_question && (
+                                    <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs p-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                        <p className="font-semibold mb-1">Clarification Needed:</p>
+                                        <p>{data.confidence_analysis.clarification_question}</p>
+                                        {data.confidence_analysis.reason && (
+                                            <p className="mt-2 text-gray-300 italic text-[10px]">Reason: {data.confidence_analysis.reason}</p>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* The Main Card */}
             <div className="bg-white w-full max-w-3xl mx-auto rounded-sm shadow-[0_20px_40px_-15px_rgba(168,142,101,0.1)] overflow-hidden">
+
 
                 {/* Confidence Signal - AI Interpretation */}
                 {data.interpreted_context && (
