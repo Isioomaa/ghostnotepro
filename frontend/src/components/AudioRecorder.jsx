@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { hasReachedLimit, incrementUsageCount } from '../utils/usageTracker';
 import { transcribeAudio } from '../services/gemini';
 import PaywallModal from './PaywallModal';
@@ -6,6 +6,18 @@ import PaywallModal from './PaywallModal';
 const PLATFORMS = [
     { id: 'twitter', name: 'X' },
     { id: 'linkedin', name: 'LinkedIn' },
+];
+
+const MODE_DESCRIPTIONS = {
+    'record': 'Capture your strategic thoughts via voice recording.',
+    'upload': 'Upload an existing audio file for analysis.'
+};
+
+const SYNTHESIS_STEPS = [
+    'Uploading audio...',
+    'Transcribing voice...',
+    'Extracting core insights...',
+    'Formatting final strategy...'
 ];
 
 const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
@@ -18,11 +30,29 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioBlob, setAudioBlob] = useState(null);
     const [showPaywall, setShowPaywall] = useState(false);
+    const [synthesisStep, setSynthesisStep] = useState(0);
 
     const inputRef = useRef(null);
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
     const timerRef = useRef(null);
+
+    // Cycle through synthesis steps
+    useEffect(() => {
+        if (loading) {
+            setSynthesisStep(0);
+            const interval = setInterval(() => {
+                setSynthesisStep(prev => {
+                    if (prev < SYNTHESIS_STEPS.length - 1) {
+                        return prev + 1;
+                    }
+                    return prev;
+                });
+            }, 2000); // Change message every 2 seconds
+
+            return () => clearInterval(interval);
+        }
+    }, [loading]);
 
     const togglePlatform = (platformId) => {
         setSelectedPlatforms(prev =>
@@ -105,6 +135,8 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
         const audioData = audioBlob || file;
         if (!audioData || selectedPlatforms.length === 0) return;
 
+        setLoading(true);
+
         // Client-side transcription using Gemini
         try {
             const text = await transcribeAudio(audioData, languageName);
@@ -119,6 +151,37 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
     };
 
     const hasAudio = file || audioBlob;
+
+    // Show synthesis state when loading
+    if (loading) {
+        return (
+            <div className="space-y-12 fade-in">
+                <div className="flex flex-col items-center space-y-8">
+                    {/* Synthesis Animation */}
+                    <div className="w-32 h-32 rounded-full border-2 border-[#A88E65] flex items-center justify-center relative">
+                        <div className="absolute inset-0 rounded-full border-2 border-[#A88E65] animate-ping opacity-20"></div>
+                        <div className="w-6 h-6 border-2 border-[#A88E65] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+
+                    {/* Dynamic Status Message */}
+                    <div className="text-center space-y-2">
+                        <p className="text-[#F9F7F5] text-lg font-light tracking-wide">
+                            {SYNTHESIS_STEPS[synthesisStep]}
+                        </p>
+                        <div className="flex justify-center space-x-1">
+                            {SYNTHESIS_STEPS.map((_, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`w-2 h-2 rounded-full transition-all ${idx <= synthesisStep ? 'bg-[#A88E65]' : 'bg-gray-600'
+                                        }`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-12">
@@ -137,20 +200,27 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
             </div>
 
             {/* Mode Toggle - Minimal Text Links */}
-            <div className="flex justify-center items-center space-x-4 text-sm">
-                <button
-                    onClick={() => setMode('record')}
-                    className={`mode-link ${mode === 'record' ? 'active' : ''}`}
-                >
-                    {t.record}
-                </button>
-                <span className="text-[#cccccc]">|</span>
-                <button
-                    onClick={() => setMode('upload')}
-                    className={`mode-link ${mode === 'upload' ? 'active' : ''}`}
-                >
-                    {t.upload}
-                </button>
+            <div className="flex flex-col items-center space-y-3">
+                <div className="flex items-center space-x-4 text-sm">
+                    <button
+                        onClick={() => setMode('record')}
+                        className={`mode-link ${mode === 'record' ? 'active' : ''}`}
+                    >
+                        {t.record}
+                    </button>
+                    <span className="text-[#cccccc]">|</span>
+                    <button
+                        onClick={() => setMode('upload')}
+                        className={`mode-link ${mode === 'upload' ? 'active' : ''}`}
+                    >
+                        {t.upload}
+                    </button>
+                </div>
+
+                {/* Mode Context Description */}
+                <p className="text-[#999] text-xs italic max-w-xs text-center">
+                    {MODE_DESCRIPTIONS[mode]}
+                </p>
             </div>
 
             {/* Main Input Area */}
@@ -168,39 +238,35 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
                                         <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1 1.93c-3.94-.49-7-3.85-7-7.93h2c0 3.31 2.69 6 6 6s6-2.69 6-6h2c0 4.08-3.06 7.44-7 7.93V20h4v2H8v-2h4v-4.07z" />
                                     </svg>
                                 </button>
-                                <p className="text-[#cccccc] text-sm">{t.prompt}</p>
+                                <p className="text-[#cccccc] text-sm">Tap to Record</p>
                             </>
                         ) : isRecording ? (
                             <>
                                 <button
                                     onClick={stopRecording}
-                                    className="w-32 h-32 rounded-full bg-[#A88E65] flex items-center justify-center animate-pulse"
+                                    className="w-32 h-32 rounded-full bg-[#A88E65] flex items-center justify-center animate-pulse transition-all"
                                 >
                                     <div className="w-6 h-6 bg-white rounded-sm"></div>
                                 </button>
-                                <p className="text-[#F9F7F5] text-2xl font-light tracking-wider">{formatTime(recordingTime)}</p>
+                                <div className="text-center space-y-2">
+                                    <p className="text-[#F9F7F5] text-2xl font-light tracking-wider">{formatTime(recordingTime)}</p>
+                                    <p className="text-[#999] text-xs">Tap to Finish</p>
+                                </div>
                             </>
                         ) : audioBlob ? (
                             <div className="text-center space-y-4">
-                                <div className={`w-32 h-32 rounded-full border border-[#A88E65] flex items-center justify-center ${loading ? 'animate-pulse bg-[#A88E65]/10' : ''}`}>
-                                    {loading ? (
-                                        <div className="w-6 h-6 border-2 border-[#A88E65] border-t-transparent rounded-full animate-spin"></div>
-                                    ) : (
-                                        <svg className="w-8 h-8 text-[#A88E65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
+                                <div className="w-32 h-32 rounded-full border border-[#A88E65] flex items-center justify-center">
+                                    <svg className="w-8 h-8 text-[#A88E65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M5 13l4 4L19 7" />
+                                    </svg>
                                 </div>
                                 <p className="text-[#F9F7F5] text-lg font-light">
-                                    {loading ? t.processing : formatTime(recordingTime)}
+                                    {formatTime(recordingTime)}
                                 </p>
-                                {/* Hide Discard/Re-record when transmuting */}
-                                {!loading && (
-                                    <div className="flex space-x-6 justify-center text-sm">
-                                        <button onClick={discardRecording} className="text-[#999] hover:text-[#F9F7F5]">Discard</button>
-                                        <button onClick={startRecording} className="text-[#A88E65] hover:opacity-70">Re-record</button>
-                                    </div>
-                                )}
+                                <div className="flex space-x-6 justify-center text-sm">
+                                    <button onClick={discardRecording} className="text-[#999] hover:text-[#F9F7F5]">Discard</button>
+                                    <button onClick={startRecording} className="text-[#A88E65] hover:opacity-70">Re-record</button>
+                                </div>
                             </div>
                         ) : null}
                     </div>
