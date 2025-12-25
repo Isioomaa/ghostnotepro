@@ -33,9 +33,9 @@ const PaystackSub = ({ email, amount, metadata, onSuccess, onClose }) => {
     return (
         <button
             onClick={handlePayment}
-            className="w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-[0.2em] shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase text-xs"
+            className="w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-wide shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm"
         >
-            BECOME A MEMBER (${amount}/mo)
+            Continue with Membership (${amount}/mo)
         </button>
     );
 };
