@@ -62,38 +62,42 @@ LANGUAGE REQUIREMENT:
 - Use professional, high-status idiom appropriate for ${language} business contexts.
 
 OUTPUT FORMAT:
-Return a strictly valid JSON object with exactly these four keys:
+Return a strictly valid JSON object with exactly these five keys:
 
-1. "strategy": (String, Markdown) 
-   - Style: Narrative, thoughtful, high-level reasoning.
-   - Tone: Consultant/Strategist. Use paragraphs, rhetorical framing, and "first principles" thinking.
-   - Goal: Explain *why* this matters. Synthesize core insights and unique angles.
+1. "interpreted_context": (String)
+   - A 1-sentence meta-summary of the user's intent and topic.
+   - Start with "Discovered context:" or similar phrasing.
+   - Example: "Discovered context: Strategic planning session focused on sales maturity and Q3 growth."
+   - This helps the user confirm the AI understood the recording correctly.
 
-2. "email_draft": (String, Markdown)
-   - Style: Short, punchy, human. NO corporate fluff.
-   - Tone: Busy CEO to trusted team. Direct and motivational.
-   - Format: Subject line included as first line (bolded). 3-4 sentences max, followed by a clear "Go execute" closing.
+2. "strategy": (String, Markdown) 
+   - A detailed strategic analysis of the user's thoughts. 
+   - Use H2 (##) for main sections.
+   - Synthesize the core insights, unique angles, and high-level vision. 
+   - Tone: Visionary, decisive, analytical.
 
-3. "action_plan": (String, Markdown)
-   - Style: Clinical, rigid, high-density.
+3. "email_draft": (String, Markdown)
+   - A delegation email written FROM the user TO their team.
+   - Subject line included as the first line (bolded).
+   - Summarize the strategy and give clear marching orders.
+   - Tone: Authoritative, clear, trusting but firm.
+
+4. "action_plan": (String, Markdown)
+   - A crisp, bulleted list of tactical next steps.
+   - Group by category if needed.
+   - Assign owners/deadlines placeholders (e.g., [Owner], [Date]) if not specified.
    - Tone: purely tactical and execution-focused.
-   - Format: Strictly bulleted.
-   - Requirement: Every bullet MUST include: [Task] + [Owner] + [Deadline] + [KPI/Metric].
 
-4. "clarifying_questions": (Array of Strings)
+5. "clarifying_questions": (Array of Strings)
    - An array of exactly 3 strategic questions.
    - Identify missing context, risks, budget issues, or timeline gaps that the user forgot to mention.
    - These should be sharp, specific questions that a Chief of Staff would ask to protect the executive.
-
-5. "social_content": (Object)
-    - "twitter_post": (String) Punchy, viral summary under 200 characters. NO HASHTAGS. Optimization: Engagement.
-    - "linkedin_post": (String) Professional, structured reflection (150-200 words). Use bullet points and "Thought Leadership" tone. Optimization: Authority.
-    - "whatsapp_msg": (String) Direct, conversational summary. "Hey team, here is the breakdown: [Core Insight]. Let's discuss." Optimization: Clarity.
 
 CRITICAL RULES:
 1. Do NOT chat. Do NOT say "Here is your analysis". Just return the JSON.
 2. Ensure the JSON is valid. Escape quotes within strings properly.
 3. The "clarifying_questions" MUST be an array of strings, not a single string.
+4. The "interpreted_context" MUST be generated first and be a single concise sentence.
 `;
 };
 
