@@ -31,6 +31,7 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
     const [audioBlob, setAudioBlob] = useState(null);
     const [showPaywall, setShowPaywall] = useState(false);
     const [synthesisStep, setSynthesisStep] = useState(0);
+    const [showTransmuteButton, setShowTransmuteButton] = useState(false);
 
     const inputRef = useRef(null);
     const mediaRecorderRef = useRef(null);
@@ -48,11 +49,24 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
                     }
                     return prev;
                 });
-            }, 2000); // Change message every 2 seconds
+            }, 2000);
 
             return () => clearInterval(interval);
         }
     }, [loading]);
+
+    // Dramatic pause for transmute button (700ms delay)
+    useEffect(() => {
+        if (audioBlob || file) {
+            setShowTransmuteButton(false);
+            const timer = setTimeout(() => {
+                setShowTransmuteButton(true);
+            }, 700);
+            return () => clearTimeout(timer);
+        } else {
+            setShowTransmuteButton(false);
+        }
+    }, [audioBlob, file]);
 
     const togglePlatform = (platformId) => {
         setSelectedPlatforms(prev =>
@@ -137,7 +151,6 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
 
         setLoading(true);
 
-        // Client-side transcription using Gemini
         try {
             const text = await transcribeAudio(audioData, languageName);
             incrementUsageCount();
@@ -157,13 +170,11 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
         return (
             <div className="space-y-12 fade-in">
                 <div className="flex flex-col items-center space-y-8">
-                    {/* Synthesis Animation */}
                     <div className="w-32 h-32 rounded-full border-2 border-[#A88E65] flex items-center justify-center relative">
                         <div className="absolute inset-0 rounded-full border-2 border-[#A88E65] animate-ping opacity-20"></div>
                         <div className="w-6 h-6 border-2 border-[#A88E65] border-t-transparent rounded-full animate-spin"></div>
                     </div>
 
-                    {/* Dynamic Status Message */}
                     <div className="text-center space-y-2">
                         <p className="text-[#F9F7F5] text-lg font-light tracking-wide">
                             {SYNTHESIS_STEPS[synthesisStep]}
@@ -185,8 +196,6 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
 
     return (
         <div className="space-y-12">
-
-            {/* Platform Selection - Minimal Text Tags */}
             <div className="flex justify-center space-x-8">
                 {PLATFORMS.map(platform => (
                     <button
@@ -199,7 +208,6 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
                 ))}
             </div>
 
-            {/* Mode Toggle - Minimal Text Links */}
             <div className="flex flex-col items-center space-y-3">
                 <div className="flex items-center space-x-4 text-sm">
                     <button
@@ -217,16 +225,13 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
                     </button>
                 </div>
 
-                {/* Mode Context Description */}
                 <p className="text-[#999] text-xs italic max-w-xs text-center">
                     {MODE_DESCRIPTIONS[mode]}
                 </p>
             </div>
 
-            {/* Main Input Area */}
             <div className="flex flex-col items-center">
                 {mode === 'record' ? (
-                    /* Recording Area - Bronze Ring */
                     <div className="flex flex-col items-center space-y-8">
                         {!isRecording && !audioBlob ? (
                             <>
@@ -271,7 +276,6 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
                         ) : null}
                     </div>
                 ) : (
-                    /* Upload Area - Minimal */
                     <div className="flex flex-col items-center space-y-6">
                         <input
                             ref={inputRef}
@@ -310,19 +314,24 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
 
             {error && <p className="text-center text-red-600 text-sm">{error}</p>}
 
-            {/* Transmute Button - Text Only */}
             {hasAudio && (
-                <div className="flex justify-center pt-8">
+                <div className={`flex flex-col items-center pt-8 space-y-3 transition-all duration-700 ${showTransmuteButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    }`}>
                     <button
                         onClick={handleUpload}
-                        disabled={loading || selectedPlatforms.length === 0}
-                        className="btn-transmute"
+                        disabled={loading || selectedPlatforms.length === 0 || !showTransmuteButton}
+                        className="btn-transmute flex items-center space-x-2"
                     >
-                        {loading ? t.processing : t.btn_transmute}
+                        <span className="text-lg">✨</span>
+                        <span>Transmute my thoughts</span>
                     </button>
+
+                    <p className="text-[#666] text-xs italic">
+                        Ready to turn noise into signal.
+                    </p>
                 </div>
             )}
-            {/* Paywall Modal */}
+
             {showPaywall && (
                 <PaywallModal onClose={() => setShowPaywall(false)} />
             )}
