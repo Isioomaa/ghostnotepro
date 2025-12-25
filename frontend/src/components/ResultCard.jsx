@@ -98,10 +98,31 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                             <div className="flex-1">
                                 <p className="text-green-800 text-xs uppercase tracking-widest font-semibold mb-1">Context Detected</p>
                                 <p className="text-green-900 text-sm font-sans leading-relaxed">{data.interpreted_context}</p>
+
+                                {/* Transparency - Collapsible Thought Trace */}
+                                {data.thought_trace && data.thought_trace.length > 0 && (
+                                    <details className="mt-3 group">
+                                        <summary className="cursor-pointer text-xs text-gray-500 hover:text-gray-700 transition-colors list-none flex items-center space-x-1">
+                                            <span className="group-open:rotate-90 transition-transform inline-block">▸</span>
+                                            <span>✨ View detected key concepts</span>
+                                        </summary>
+                                        <div className="mt-2 flex flex-wrap gap-2">
+                                            {data.thought_trace.map((concept, idx) => (
+                                                <span
+                                                    key={idx}
+                                                    className="inline-block bg-white border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"
+                                                >
+                                                    {concept}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </details>
+                                )}
                             </div>
                         </div>
                     </div>
                 )}
+
 
                 {/* Tab Bar */}
                 <div className="flex border-b border-gray-100 flex-wrap">

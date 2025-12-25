@@ -62,7 +62,7 @@ LANGUAGE REQUIREMENT:
 - Use professional, high-status idiom appropriate for ${language} business contexts.
 
 OUTPUT FORMAT:
-Return a strictly valid JSON object with exactly these five keys:
+Return a strictly valid JSON object with exactly these six keys:
 
 1. "interpreted_context": (String)
    - A 1-sentence meta-summary of the user's intent and topic.
@@ -70,25 +70,31 @@ Return a strictly valid JSON object with exactly these five keys:
    - Example: "Discovered context: Strategic planning session focused on sales maturity and Q3 growth."
    - This helps the user confirm the AI understood the recording correctly.
 
-2. "strategy": (String, Markdown) 
+2. "thought_trace": (Array of Strings)
+   - List 3-5 specific raw concepts, keywords, or data points you detected in the audio.
+   - These should be concrete, specific terms that show what you heard.
+   - Example: ["Retention leak", "Q1 Deadline", "Budget constraints", "Team expansion"]
+   - Keep each item short (1-3 words maximum).
+
+3. "strategy": (String, Markdown) 
    - A detailed strategic analysis of the user's thoughts. 
    - Use H2 (##) for main sections.
    - Synthesize the core insights, unique angles, and high-level vision. 
    - Tone: Visionary, decisive, analytical.
 
-3. "email_draft": (String, Markdown)
+4. "email_draft": (String, Markdown)
    - A delegation email written FROM the user TO their team.
    - Subject line included as the first line (bolded).
    - Summarize the strategy and give clear marching orders.
    - Tone: Authoritative, clear, trusting but firm.
 
-4. "action_plan": (String, Markdown)
+5. "action_plan": (String, Markdown)
    - A crisp, bulleted list of tactical next steps.
    - Group by category if needed.
    - Assign owners/deadlines placeholders (e.g., [Owner], [Date]) if not specified.
    - Tone: purely tactical and execution-focused.
 
-5. "clarifying_questions": (Array of Strings)
+6. "clarifying_questions": (Array of Strings)
    - An array of exactly 3 strategic questions.
    - Identify missing context, risks, budget issues, or timeline gaps that the user forgot to mention.
    - These should be sharp, specific questions that a Chief of Staff would ask to protect the executive.
@@ -98,6 +104,7 @@ CRITICAL RULES:
 2. Ensure the JSON is valid. Escape quotes within strings properly.
 3. The "clarifying_questions" MUST be an array of strings, not a single string.
 4. The "interpreted_context" MUST be generated first and be a single concise sentence.
+5. The "thought_trace" MUST be an array of 3-5 short keyword strings.
 `;
 };
 
