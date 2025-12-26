@@ -2,12 +2,13 @@ import React from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import { setPro } from '../utils/usageTracker';
 
-const PaystackSub = ({ email, amount, metadata, onSuccess, onClose }) => {
+const PaystackSub = ({ email, amount, currency, displayText, metadata, onSuccess, onClose }) => {
     // Note: Public key should ideally come from env
     const config = {
         reference: (new Date()).getTime().toString(),
         email: email || "customer@example.com",
-        amount: amount * 100, // Paystack expects amount in kobos
+        amount: amount, // Received in base units (kobo/cents)
+        currency: currency || 'USD',
         publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder',
         metadata: {
             custom_fields: [
@@ -46,7 +47,7 @@ const PaystackSub = ({ email, amount, metadata, onSuccess, onClose }) => {
             onClick={handlePayment}
             className="w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-wide shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm"
         >
-            Continue with Membership (${amount}/mo)
+            Continue with Membership ({displayText})
         </button>
     );
 };

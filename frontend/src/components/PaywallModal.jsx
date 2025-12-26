@@ -9,9 +9,21 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
         onClose();
     };
 
-    const handleClose = () => {
-        console.log('Payment closed');
-    };
+    // Smart Currency Logic
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const isNigeria = userTimezone.includes('Lagos') || userTimezone.includes('Africa/Lagos');
+
+    const paymentConfig = isNigeria
+        ? {
+            amount: 3000000, // ₦30,000 in kobo
+            currency: 'NGN',
+            displayText: '₦30,000/mo'
+        }
+        : {
+            amount: 2000, // $20.00 in cents
+            currency: 'USD',
+            displayText: '$20/mo'
+        };
 
     // Scenario-specific content
     const isLimitReached = scenario === 'limit_reached';
@@ -62,7 +74,9 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
 
                 <div className="space-y-4">
                     <PaystackSub
-                        amount={20}
+                        amount={paymentConfig.amount}
+                        currency={paymentConfig.currency}
+                        displayText={paymentConfig.displayText}
                         onSuccess={handleSuccess}
                         onClose={handleClose}
                     />
