@@ -2,31 +2,43 @@ import React, { useState } from 'react';
 import { FaLinkedin, FaXTwitter, FaWhatsapp, FaRegCopy } from 'react-icons/fa6';
 
 const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, url = "https://ghostnotepro.com" }) => {
-    const [copied, setCopied] = useState(false);
+    const [sharing, setSharing] = useState(false);
 
-    const handleCopy = async () => {
+    const handleCopy = async (text, showToast = true) => {
         try {
-            await navigator.clipboard.writeText(textToShare);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            await navigator.clipboard.writeText(text);
+            if (showToast) {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            }
+            return true;
         } catch (err) {
             console.error('Failed to copy:', err);
+            return false;
         }
     };
 
     const handleLinkedIn = async () => {
-        try {
-            // Priority: linkedin_version from AI, then textToShare fallback
-            const linkedInContent = analysisResult?.linkedin_version || textToShare;
-            await navigator.clipboard.writeText(linkedInContent);
+        const content = analysisResult?.linkedin_version || textToShare;
 
-            // 2. Alert user
-            alert("LinkedIn Draft Copied! Paste it into your post.");
+        // 1. Try Native Share first (Mobile)
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'GhostNote Pro Strategy',
+                    text: content,
+                    url: url
+                });
+                return;
+            } catch (err) {
+                console.log('Native share cancelled or failed:', err);
+            }
+        }
 
-            // 3. Open LinkedIn share 
-            window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank');
-        } catch (err) {
-            console.error('LinkedIn copy failed:', err);
+        // 2. Fallback to Copy + Open (Desktop/Legacy)
+        const success = await handleCopy(content, false);
+        if (success) {
+            alert("Strategic post copied to clipboard!\n\nGhostNote Pro is opening LinkedIn. Paste your post to share.");
             window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank');
         }
     };
@@ -81,7 +93,7 @@ const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, ur
                 <FaWhatsapp size={20} />
             </button>
             <button
-                onClick={handleCopy}
+                onClick={() => handleCopy(textToShare)}
                 className={`flex items-center space-x-2 font-medium text-xs uppercase tracking-widest transition-colors ${copied ? 'text-green-500' : 'text-[#999] hover:text-[#A88E65]'
                     }`}
                 title="Copy Text"
