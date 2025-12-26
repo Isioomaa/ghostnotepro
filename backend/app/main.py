@@ -24,7 +24,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to ViraVoice API"}
+    return {"message": "Welcome to GhostNote Pro API"}
 
 @app.get("/health")
 def health_check():

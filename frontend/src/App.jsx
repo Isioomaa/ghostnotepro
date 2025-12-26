@@ -30,12 +30,27 @@ function App() {
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.EN;
 
   const handleUploadSuccess = async (text) => {
+    if (!text) return;
     setTranscription(text);
     try {
       const analysisResult = analyzeText(text);
-      setAnalysis(analysisResult);
+      setAnalysis(analysisResult || {
+        word_count: 0,
+        tone: "Neutral",
+        emotion: "calm",
+        virality_score: 0,
+        suggestions: []
+      });
     } catch (err) {
       console.error("Analysis failed", err);
+      // Fallback analysis object
+      setAnalysis({
+        word_count: 0,
+        tone: "Neutral",
+        emotion: "calm",
+        virality_score: 0,
+        suggestions: []
+      });
     }
   };
 

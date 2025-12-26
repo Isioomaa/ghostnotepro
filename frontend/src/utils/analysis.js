@@ -1,6 +1,15 @@
 export const analyzeText = (text) => {
+    if (!text || typeof text !== 'string') {
+        return {
+            word_count: 0,
+            tone: "Neutral",
+            emotion: "calm",
+            virality_score: 0,
+            suggestions: []
+        };
+    }
     const textLower = text.toLowerCase();
-    const words = text.split(/\s+/);
+    const words = text.trim().split(/\s+/).filter(w => w.length > 0);
     const wordCount = words.length;
 
     // Indicators of anger/frustration
