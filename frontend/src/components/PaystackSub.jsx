@@ -1,48 +1,72 @@
 import React from 'react';
-import { PaystackButton } from 'react-paystack';
+import { usePaystackPayment } from 'react-paystack';
 import { setPro } from '../utils/usageTracker';
 
-const PaystackSub = ({ email, amount, currency, displayText, metadata, onSuccess, onClose }) => {
-    // Safety Fallbacks
+const PaystackSub = ({ email, amount, currency, displayText, onSuccess, onClose }) => {
+    // 1. Safety Fallbacks
     const safeEmail = email || "customer@example.com";
     const safeAmount = amount || 2000;
     const safeCurrency = currency || 'USD';
-    const safeDisplay = displayText || (safeCurrency === 'USD' ? '$20/mo' : '₦30,000/mo');
+    const safeDisplay = displayText || (safeCurrency === 'USD' ? '$20' : '₦30,000');
+
+    // Use a realistic-looking placeholder if the user hasn't set their key yet
+    // This prevents runtime crashes in some versions of the Paystack library
+    const fallbackKey = "pk_test_000000000000000000000000000000000000000";
+    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || fallbackKey;
+
+    console.log("Initializing Paystack with:", { safeCurrency, safeAmount, hasKey: !!import.meta.env.VITE_PAYSTACK_PUBLIC_KEY });
 
     const config = {
-        reference: (new Date()).getTime().toString(),
+        reference: `T${Date.now()}`,
         email: safeEmail,
         amount: safeAmount,
         currency: safeCurrency,
-        publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder',
+        publicKey: publicKey,
         metadata: {
-            custom_fields: [
-                {
-                    display_name: "Subscription Plan",
-                    variable_name: "subscription_plan",
-                    value: "GhostNote Pro Membership"
-                },
-                ...Object.entries(metadata || {}).map(([key, value]) => ({
-                    display_name: key,
-                    variable_name: key.toLowerCase().replace(/\s+/g, '_'),
-                    value: value
-                }))
-            ]
+            plan: "GhostNote Pro"
         }
     };
 
-    const componentProps = {
-        ...config,
-        text: `Continue with Membership (${safeDisplay})`,
-        onSuccess: (reference) => {
-            setPro(true);
-            if (onSuccess) onSuccess(reference);
-        },
-        onClose: onClose,
-        className: "w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-wide shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm"
+    let initializePayment;
+    try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        initializePayment = usePaystackPayment(config);
+    } catch (err) {
+        console.error("CRITICAL: usePaystackPayment hook failed!", err);
+    }
+
+    const handlePayment = () => {
+        if (!initializePayment) {
+            alert("Payment system is unavailable. Please check your internet connection.");
+            return;
+        }
+
+        try {
+            initializePayment(
+                (reference) => {
+                    console.log("Paystack Success Reference:", reference);
+                    setPro(true);
+                    if (onSuccess) onSuccess(reference);
+                },
+                () => {
+                    console.log("Paystack Modal Closed");
+                    if (onClose) onClose();
+                }
+            );
+        } catch (err) {
+            console.error("Paystack Execution Error:", err);
+            alert("Could not open payment gateway. Please try refreshing.");
+        }
     };
 
-    return <PaystackButton {...componentProps} />;
+    return (
+        <button
+            onClick={handlePayment}
+            className="w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-widest shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-xs uppercase"
+        >
+            Upgrade Now ({safeDisplay})
+        </button>
+    );
 };
 
 export default PaystackSub;
