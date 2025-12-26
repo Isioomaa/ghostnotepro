@@ -15,10 +15,6 @@ const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, ur
     };
 
     const handleLinkedIn = async () => {
-        if (!isPro) {
-            onPaywallTrigger();
-            return;
-        }
         try {
             // Priority: linkedin_version from AI, then textToShare fallback
             const linkedInContent = analysisResult?.linkedin_version || textToShare;
@@ -36,10 +32,6 @@ const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, ur
     };
 
     const handleX = () => {
-        if (!isPro) {
-            onPaywallTrigger();
-            return;
-        }
         // Priority: x_version from AI, then textToShare fallback
         let content = analysisResult?.x_version;
 
@@ -53,10 +45,6 @@ const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, ur
     };
 
     const handleWhatsApp = () => {
-        if (!isPro) {
-            onPaywallTrigger();
-            return;
-        }
         // Priority: whatsapp_version from AI, then textToShare fallback
         let content = analysisResult?.whatsapp_version;
 
@@ -73,33 +61,24 @@ const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, ur
         <div className="flex justify-center items-center gap-6 mt-6">
             <button
                 onClick={handleLinkedIn}
-                className={`opacity-60 hover:opacity-100 transition-all ${isPro ? 'text-[#0077b5]' : 'text-gray-400'}`}
-                title={isPro ? "Share to LinkedIn" : "Upgrade to Share"}
+                className="opacity-60 hover:opacity-100 text-[#999] hover:text-[#0077b5] transition-all"
+                title="Share to LinkedIn (Copies text first)"
             >
-                <div className="relative">
-                    <FaLinkedin size={20} />
-                    {!isPro && <span className="absolute -top-1 -right-1 text-[8px]">🔒</span>}
-                </div>
+                <FaLinkedin size={20} />
             </button>
             <button
                 onClick={handleX}
-                className={`opacity-60 hover:opacity-100 transition-all ${isPro ? 'text-[#1DA1F2]' : 'text-gray-400'}`}
-                title={isPro ? "Share to X" : "Upgrade to Share"}
+                className="opacity-60 hover:opacity-100 text-[#999] hover:text-[#1DA1F2] transition-all"
+                title="Share to X"
             >
-                <div className="relative">
-                    <FaXTwitter size={20} />
-                    {!isPro && <span className="absolute -top-1 -right-1 text-[8px]">🔒</span>}
-                </div>
+                <FaXTwitter size={20} />
             </button>
             <button
                 onClick={handleWhatsApp}
-                className={`opacity-60 hover:opacity-100 transition-all ${isPro ? 'text-[#25D366]' : 'text-gray-400'}`}
-                title={isPro ? "Share to WhatsApp" : "Upgrade to Share"}
+                className="opacity-60 hover:opacity-100 text-[#999] hover:text-[#25D366] transition-all"
+                title="Share to WhatsApp"
             >
-                <div className="relative">
-                    <FaWhatsapp size={20} />
-                    {!isPro && <span className="absolute -top-1 -right-1 text-[8px]">🔒</span>}
-                </div>
+                <FaWhatsapp size={20} />
             </button>
             <button
                 onClick={handleCopy}
