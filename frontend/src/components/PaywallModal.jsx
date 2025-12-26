@@ -1,7 +1,7 @@
 import React from 'react';
 import PaystackSub from './PaystackSub';
 
-const PaywallModal = ({ onClose }) => {
+const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
     const handleSuccess = (reference) => {
         console.log('Payment successful. Reference:', reference);
         alert('Thank you for becoming a member!');
@@ -11,6 +11,9 @@ const PaywallModal = ({ onClose }) => {
     const handleClose = () => {
         console.log('Payment closed');
     };
+
+    // Scenario-specific content
+    const isLimitReached = scenario === 'limit_reached';
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -26,12 +29,30 @@ const PaywallModal = ({ onClose }) => {
                 {/* Decorative Element */}
                 <div className="w-16 h-1 bg-[#A88E65] mx-auto mb-8"></div>
 
-                <h2 className="font-serif text-2xl md:text-3xl text-[#A88E65] mb-4 tracking-wide">
-                    Continue turning thought into strategy
-                </h2>
+                {/* Conditional Headlines */}
+                {isLimitReached ? (
+                    <>
+                        <h2 className="font-serif text-2xl md:text-3xl text-[#A88E65] mb-2 tracking-wide">
+                            You've crossed the threshold.
+                        </h2>
+                        <h3 className="font-serif text-xl text-gray-400 mb-4">
+                            Continue thinking clearly.
+                        </h3>
+                    </>
+                ) : (
+                    <h2 className="font-serif text-2xl md:text-3xl text-[#A88E65] mb-4 tracking-wide">
+                        Continue turning thought into strategy
+                    </h2>
+                )}
 
-                <p className="font-light text-gray-400 mb-8 leading-relaxed text-sm md:text-base">
+                {/* Body Text */}
+                <p className="font-light text-gray-400 mb-4 leading-relaxed text-sm md:text-base">
                     You've experienced GhostNote Pro's core workflow. Membership unlocks uninterrupted transmutation—from raw thinking to strategic clarity.
+                </p>
+
+                {/* Social Proof */}
+                <p className="font-light text-gray-500 mb-8 leading-relaxed text-xs italic">
+                    Most members use GhostNote Pro to clarify thinking after meetings, during planning, and before writing.
                 </p>
 
                 <div className="space-y-4">

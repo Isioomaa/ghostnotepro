@@ -1,5 +1,6 @@
 import React from 'react';
 import { usePaystackPayment } from 'react-paystack';
+import { setPro } from '../utils/usageTracker';
 
 const PaystackSub = ({ email, amount, metadata, onSuccess, onClose }) => {
     // Note: Public key should ideally come from env
@@ -27,7 +28,17 @@ const PaystackSub = ({ email, amount, metadata, onSuccess, onClose }) => {
     const initializePayment = usePaystackPayment(config);
 
     const handlePayment = () => {
-        initializePayment(onSuccess, onClose);
+        initializePayment(
+            (reference) => {
+                // Set Pro status on successful payment
+                setPro(true);
+                // Call the original onSuccess callback
+                if (onSuccess) {
+                    onSuccess(reference);
+                }
+            },
+            onClose
+        );
     };
 
     return (

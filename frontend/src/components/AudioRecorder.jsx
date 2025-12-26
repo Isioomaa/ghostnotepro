@@ -89,6 +89,12 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
     };
 
     const startRecording = async () => {
+        // Check usage limit before allowing recording
+        if (hasReachedLimit()) {
+            setShowPaywall(true);
+            return;
+        }
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorderRef.current = new MediaRecorder(stream, {
@@ -141,6 +147,7 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
     };
 
     const handleUpload = async () => {
+        // Check usage limit before processing
         if (hasReachedLimit()) {
             setShowPaywall(true);
             return;
@@ -153,6 +160,7 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
 
         try {
             const text = await transcribeAudio(audioData, languageName);
+            // Increment usage count AFTER successful generation
             incrementUsageCount();
             onUploadSuccess(text, selectedPlatforms);
         } catch (err) {
@@ -332,8 +340,12 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
                 </div>
             )}
 
+            {/* Paywall Modal */}
             {showPaywall && (
-                <PaywallModal onClose={() => setShowPaywall(false)} />
+                <PaywallModal
+                    onClose={() => setShowPaywall(false)}
+                    scenario="limit_reached"
+                />
             )}
         </div>
     );

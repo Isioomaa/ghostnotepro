@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import AudioRecorder from './components/AudioRecorder';
-import ResultCard from './components/ResultCard'; // New Component
+import ResultCard from './components/ResultCard';
 import LanguageSelector from './components/LanguageSelector';
+import PaywallModal from './components/PaywallModal';
 import { TRANSLATIONS, getLanguageName } from './constants/languages';
 import { analyzeText } from './utils/analysis';
 import { PrivacyPolicy, TermsOfService, RefundPolicy } from './components/LegalDocs';
@@ -13,6 +14,7 @@ function App() {
   const [currentLang, setCurrentLang] = useState('EN');
   const [activeView, setActiveView] = useState('main'); // 'main', 'privacy', 'terms', 'refund'
   const [showToast, setShowToast] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.EN;
 
@@ -66,6 +68,13 @@ function App() {
             currentLang={currentLang}
             onLanguageChange={setCurrentLang}
           />
+          {/* Get Pro Button */}
+          <button
+            onClick={() => setShowPaywall(true)}
+            className="text-xs font-medium bg-[#A88E65] text-[#1A1A1A] px-4 py-2 rounded-full tracking-widest hover:bg-[#8F7650] transition-all"
+          >
+            GET PRO
+          </button>
           {/* Version Badge */}
           <span className="text-xs font-medium opacity-50 border border-white/10 px-3 py-1 rounded-full tracking-widest">
             v1.0
@@ -151,6 +160,14 @@ function App() {
         <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full text-xs font-bold shadow-2xl tracking-widest uppercase">
           Link copied to clipboard
         </div>
+      )}
+
+      {/* Paywall Modal */}
+      {showPaywall && (
+        <PaywallModal
+          onClose={() => setShowPaywall(false)}
+          scenario="upsell"
+        />
       )}
     </div>
   );
