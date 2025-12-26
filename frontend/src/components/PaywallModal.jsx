@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
 import PaystackSub from './PaystackSub';
 
@@ -9,24 +9,39 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
         onClose();
     };
 
-    // Smart Currency Logic
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const isNigeria = userTimezone.includes('Lagos') || userTimezone.includes('Africa/Lagos');
+    // Smart Currency Logic with Fail-Safe Defaults
+    const [paymentConfig, setPaymentConfig] = useState({
+        amount: 2000, // Safety Default: $20.00
+        currency: 'USD',
+        displayText: '$20/mo'
+    });
 
-    const paymentConfig = isNigeria
-        ? {
-            amount: 3000000, // ₦30,000 in kobo
-            currency: 'NGN',
-            displayText: '₦30,000/mo'
+    useEffect(() => {
+        try {
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const isNigeria = userTimezone.includes('Lagos') || userTimezone.includes('Africa/Lagos');
+
+            if (isNigeria) {
+                setPaymentConfig({
+                    amount: 3000000, // ₦30,000 in kobo
+                    currency: 'NGN',
+                    displayText: '₦30,000/mo'
+                });
+            }
+        } catch (err) {
+            console.error("Timezone detection failed, using defaults:", err);
         }
-        : {
-            amount: 2000, // $20.00 in cents
-            currency: 'USD',
-            displayText: '$20/mo'
-        };
+    }, []);
+
+    const handleClose = () => {
+        console.log('Payment closed');
+    };
 
     // Scenario-specific content
     const isLimitReached = scenario === 'limit_reached';
+
+    // Safety guard
+    if (!paymentConfig) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
