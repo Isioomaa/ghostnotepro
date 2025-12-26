@@ -35,7 +35,7 @@ const fileToGenerativePart = async (blob) => {
 export const transcribeAudio = async (audioBlob, language) => {
     return retryWithBackoff(async () => {
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
             const audioPart = await fileToGenerativePart(audioBlob);
 
             let prompt = "Transcribe this audio accurately. Return ONLY the transcription text, nothing else.";
@@ -102,7 +102,7 @@ The user should feel: “This captures exactly what I meant — only clearer and
 export const generateExecutiveSuite = async (text, analysis, language, variation = false) => {
     return retryWithBackoff(async () => {
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json" } });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
 
             const systemPrompt = buildSystemPrompt(language);
 

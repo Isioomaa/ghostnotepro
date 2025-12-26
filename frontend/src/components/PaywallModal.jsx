@@ -1,4 +1,5 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 import PaystackSub from './PaystackSub';
 
 const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
@@ -24,10 +25,14 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
             ></div>
 
             {/* Modal Content - Bronze Card */}
-            <div className="relative w-full max-w-md bg-[#1A1A1A] border border-[#A88E65] p-8 text-center shadow-2xl shadow-[#A88E65]/20">
+            <div className="relative w-full max-w-md bg-[#1A1A1A] border border-[#A88E65] p-8 text-center shadow-2xl">
 
-                {/* Decorative Element */}
-                <div className="w-16 h-1 bg-[#A88E65] mx-auto mb-8"></div>
+                {/* Lock Icon */}
+                <div className="flex justify-center mb-6">
+                    <div className="bg-[#A88E65]/10 p-3 rounded-full border border-[#A88E65]/20">
+                        <Lock className="w-6 h-6 text-[#A88E65]" />
+                    </div>
+                </div>
 
                 {/* Conditional Headlines */}
                 {isLimitReached ? (
