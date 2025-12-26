@@ -3,6 +3,7 @@ import { FaLinkedin, FaXTwitter, FaWhatsapp, FaRegCopy } from 'react-icons/fa6';
 
 const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, url = "https://ghostnotepro.com" }) => {
     const [sharing, setSharing] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const handleCopy = async (text, showToast = true) => {
         try {
