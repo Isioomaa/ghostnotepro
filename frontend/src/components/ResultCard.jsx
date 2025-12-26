@@ -7,7 +7,7 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState('strategy');
+    const [activeTab, setActiveTab] = useState('synthesis');
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -59,16 +59,67 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
 
     // Results View
     const tabs = [
-        { id: 'strategy', label: 'Strategy' },
-        { id: 'email_draft', label: 'Team Email' },
-        { id: 'action_plan', label: 'Action Plan' }
+        { id: 'synthesis', label: 'Synthesis' },
+        { id: 'strategic', label: 'Strategic' },
+        { id: 'tactical', label: 'Tactical' }
     ];
 
-    const currentContent = data[activeTab] || "No content available.";
+    // Map new data to tabs
+    const getTabContent = (id) => {
+        if (id === 'synthesis') {
+            return (
+                <div className="space-y-8">
+                    <div>
+                        <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Executive Summary</h4>
+                        <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
+                            {data.executive_summary}
+                        </div>
+                    </div>
+                    {data.key_points && data.key_points.length > 0 && (
+                        <div>
+                            <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Key Points</h4>
+                            <ul className="space-y-3">
+                                {data.key_points.map((point, idx) => (
+                                    <li key={idx} className="flex items-start text-[#1A1A1A] text-base font-sans leading-relaxed">
+                                        <span className="mr-3 text-[#A88E65]">•</span>
+                                        {point}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        if (id === 'strategic') {
+            return (
+                <div>
+                    <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Strategic Interpretation</h4>
+                    <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
+                        {data.strategic_interpretation}
+                    </div>
+                </div>
+            );
+        }
+        if (id === 'tactical') {
+            return (
+                <div>
+                    <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Action Direction</h4>
+                    <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
+                        {data.action_direction}
+                    </div>
+                </div>
+            );
+        }
+        return "No content available.";
+    };
 
     // Helper to get text for sharing
     const getTextToShare = () => {
-        return currentContent;
+        if (activeTab === 'synthesis') return `${data.executive_summary}\n\n${data.key_points?.join('\n')}`;
+        if (activeTab === 'strategic') return data.strategic_interpretation;
+        if (activeTab === 'tactical') return data.action_direction;
+        return "";
     };
 
     return (
@@ -195,27 +246,10 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
 
                 {/* Content Area */}
                 <div className="p-10 md:p-14 min-h-[400px] bg-white">
-                    <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
-                        {currentContent}
-                    </div>
+                    {getTabContent(activeTab)}
                 </div>
 
-                {/* Strategic Gaps Section */}
-                {data.clarifying_questions && data.clarifying_questions.length > 0 && (
-                    <div className="bg-[#FFFBF0] p-8 border-t border-[#F0E6D2]">
-                        <h4 className="text-[#A88E65] text-xs uppercase tracking-widest font-bold mb-4 flex items-center">
-                            <span className="mr-2 text-lg">⚠️</span> Strategic Gaps
-                        </h4>
-                        <ul className="space-y-3">
-                            {data.clarifying_questions.map((q, idx) => (
-                                <li key={idx} className="flex items-start text-[#5A5A5A] text-sm md:text-base font-sans leading-relaxed">
-                                    <span className="mr-2 text-[#A88E65]">•</span>
-                                    {q}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
+
             </div>
 
             {/* Share Actions */}
