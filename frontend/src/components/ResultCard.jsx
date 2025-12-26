@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ShareActions from './ShareActions';
+import PaywallModal from './PaywallModal';
 import { generateExecutiveSuite } from '../services/gemini';
 import { isPro } from '../utils/usageTracker';
 
@@ -8,6 +9,7 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('synthesis');
+    const [showPaywall, setShowPaywall] = useState(false);
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -167,7 +169,10 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                             )
                         ) : (
                             // Free users see locked badge
-                            <div className="flex items-center space-x-2 bg-gray-100 border border-gray-300 text-gray-500 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer hover:bg-gray-200 transition-colors">
+                            <div
+                                onClick={() => setShowPaywall(true)}
+                                className="flex items-center space-x-2 bg-gray-100 border border-gray-300 text-gray-500 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer hover:bg-gray-200 transition-colors"
+                            >
                                 <span>🔒</span>
                                 <span>Confidence Analysis</span>
                             </div>
@@ -218,10 +223,13 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                         {/* Lock Overlay for Free Users */}
                         {!isPro() && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-transparent backdrop-blur-[1px]">
-                                <div className="bg-[#1A1A1A]/80 border border-[#A88E65]/30 px-4 py-2 rounded-full flex items-center space-x-2 shadow-xl">
+                                <button
+                                    onClick={() => setShowPaywall(true)}
+                                    className="bg-[#1A1A1A]/80 border border-[#A88E65]/30 px-4 py-2 rounded-full flex items-center space-x-2 shadow-xl hover:bg-[#1A1A1A] transition-all transform hover:scale-105 active:scale-95"
+                                >
                                     <span className="text-[#A88E65] text-xs">🔒</span>
                                     <span className="text-white text-[10px] font-medium tracking-wide uppercase">Upgrade to unlock executive confidence analysis</span>
-                                </div>
+                                </button>
                             </div>
                         )}
                     </div>
@@ -258,6 +266,14 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                 analysisResult={data}
                 url={window.location.href}
             />
+
+            {/* Paywall Modal */}
+            {showPaywall && (
+                <PaywallModal
+                    onClose={() => setShowPaywall(false)}
+                    scenario="upsell"
+                />
+            )}
         </div>
     );
 };
