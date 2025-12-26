@@ -27,17 +27,13 @@ const PaystackSub = ({ email, amount, currency, displayText, onSuccess, onClose 
         }
     };
 
-    let initializePayment;
-    try {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        initializePayment = usePaystackPayment(config);
-    } catch (err) {
-        console.error("CRITICAL: usePaystackPayment hook failed!", err);
-    }
+    // Hook must be at the top level
+    const initializePayment = usePaystackPayment(config);
 
     const handlePayment = () => {
         if (!initializePayment) {
-            alert("Payment system is unavailable. Please check your internet connection.");
+            console.error("Paystack initialization failed - hook returned null/undefined");
+            alert("Payment system is temporarily unavailable. Please try again.");
             return;
         }
 
@@ -55,7 +51,7 @@ const PaystackSub = ({ email, amount, currency, displayText, onSuccess, onClose 
             );
         } catch (err) {
             console.error("Paystack Execution Error:", err);
-            alert("Could not open payment gateway. Please try refreshing.");
+            alert("Could not open payment gateway. Please refresh the page.");
         }
     };
 

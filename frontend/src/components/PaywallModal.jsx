@@ -12,22 +12,34 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
     });
 
     useEffect(() => {
-        console.log("PaywallModal useEffect running");
+        console.log("PaywallModal useEffect: Detecting region...");
         try {
             const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            console.log("Detected Timezone:", userTimezone);
-            const isNigeria = userTimezone && (userTimezone.includes('Lagos') || userTimezone.includes('Africa/Lagos'));
+            console.log("Resolved Timezone:", userTimezone);
+
+            const isNigeria = userTimezone && (
+                userTimezone.toLowerCase().includes('lagos') ||
+                userTimezone.toLowerCase().includes('africa/lagos')
+            );
 
             if (isNigeria) {
-                console.log("Applying Nigeria Rules");
+                console.log("Region: Nigeria. Applying NGN rates.");
                 setPaymentConfig({
                     amount: 3000000,
                     currency: 'NGN',
                     displayText: '₦30,000/mo'
                 });
+            } else {
+                console.log("Region: International. Staying with USD rates.");
+                // Explicitly set to USD just in case of state weirdness
+                setPaymentConfig({
+                    amount: 2000,
+                    currency: 'USD',
+                    displayText: '$20/mo'
+                });
             }
         } catch (err) {
-            console.error("Currency detection error:", err);
+            console.error("Region detection error, using USD fallback:", err);
         }
     }, []);
 

@@ -67,6 +67,7 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
 
     // Map new data to tabs
     const getTabContent = (id) => {
+        if (!data) return "Initializing...";
         if (id === 'synthesis') {
             return (
                 <div className="space-y-8">
@@ -117,9 +118,14 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
 
     // Helper to get text for sharing
     const getTextToShare = () => {
-        if (activeTab === 'synthesis') return `${data.executive_summary}\n\n${data.key_points?.join('\n')}`;
-        if (activeTab === 'strategic') return data.strategic_interpretation;
-        if (activeTab === 'tactical') return data.action_direction;
+        if (!data) return "";
+        if (activeTab === 'synthesis') {
+            const summary = data.executive_summary || "";
+            const bullets = (data.key_points || []).join('\n');
+            return `${summary}\n\n${bullets}`.trim();
+        }
+        if (activeTab === 'strategic') return data.strategic_interpretation || "";
+        if (activeTab === 'tactical') return data.action_direction || "";
         return "";
     };
 
