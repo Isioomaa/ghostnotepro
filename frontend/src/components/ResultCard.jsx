@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import ShareActions from './ShareActions';
 import PaywallModal from './PaywallModal';
 import { generateExecutiveSuite } from '../services/gemini';
-import { isPro } from '../utils/usageTracker';
 
-const ResultCard = ({ text, analysis, languageName, onReset }) => {
+const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -141,7 +140,7 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                 {/* Confidence Badge */}
                 {data.confidence_analysis && (
                     <div className="relative group">
-                        {isPro() ? (
+                        {isPro ? (
                             // Pro users see actual confidence badge
                             data.confidence_analysis.level === 'High' ? (
                                 <div className="flex items-center space-x-2 bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded-full text-xs font-medium">
@@ -188,7 +187,7 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                 {/* Confidence Signal - AI Interpretation */}
                 {data.interpreted_context && (
                     <div className="relative overflow-hidden">
-                        <div className={`bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-8 py-4 transition-all duration-500 ${!isPro() ? 'blur-sm select-none grayscale-[0.5]' : ''}`}>
+                        <div className={`bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-8 py-4 transition-all duration-500 ${!isPro ? 'blur-sm select-none grayscale-[0.5]' : ''}`}>
                             <div className="flex items-start space-x-3">
                                 <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -221,7 +220,7 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                         </div>
 
                         {/* Lock Overlay for Free Users */}
-                        {!isPro() && (
+                        {!isPro && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-transparent backdrop-blur-[1px]">
                                 <button
                                     onClick={() => setShowPaywall(true)}
@@ -265,6 +264,8 @@ const ResultCard = ({ text, analysis, languageName, onReset }) => {
                 textToShare={getTextToShare()}
                 analysisResult={data}
                 url={window.location.href}
+                isPro={isPro}
+                onPaywallTrigger={() => setShowPaywall(true)}
             />
 
             {/* Paywall Modal */}

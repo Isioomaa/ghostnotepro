@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaLinkedin, FaXTwitter, FaWhatsapp, FaRegCopy } from 'react-icons/fa6';
 
-const ShareActions = ({ textToShare, analysisResult, url = "https://ghostnotepro.com" }) => {
+const ShareActions = ({ textToShare, analysisResult, isPro, onPaywallTrigger, url = "https://ghostnotepro.com" }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -15,6 +15,10 @@ const ShareActions = ({ textToShare, analysisResult, url = "https://ghostnotepro
     };
 
     const handleLinkedIn = async () => {
+        if (!isPro) {
+            onPaywallTrigger();
+            return;
+        }
         try {
             // Priority: linkedin_version from AI, then textToShare fallback
             const linkedInContent = analysisResult?.linkedin_version || textToShare;
@@ -32,6 +36,10 @@ const ShareActions = ({ textToShare, analysisResult, url = "https://ghostnotepro
     };
 
     const handleX = () => {
+        if (!isPro) {
+            onPaywallTrigger();
+            return;
+        }
         // Priority: x_version from AI, then textToShare fallback
         let content = analysisResult?.x_version;
 
@@ -45,6 +53,10 @@ const ShareActions = ({ textToShare, analysisResult, url = "https://ghostnotepro
     };
 
     const handleWhatsApp = () => {
+        if (!isPro) {
+            onPaywallTrigger();
+            return;
+        }
         // Priority: whatsapp_version from AI, then textToShare fallback
         let content = analysisResult?.whatsapp_version;
 
@@ -61,24 +73,33 @@ const ShareActions = ({ textToShare, analysisResult, url = "https://ghostnotepro
         <div className="flex justify-center items-center gap-6 mt-6">
             <button
                 onClick={handleLinkedIn}
-                className="opacity-60 hover:opacity-100 text-[#999] hover:text-[#0077b5] transition-all"
-                title="Share to LinkedIn (Copies text first)"
+                className={`opacity-60 hover:opacity-100 transition-all ${isPro ? 'text-[#0077b5]' : 'text-gray-400'}`}
+                title={isPro ? "Share to LinkedIn" : "Upgrade to Share"}
             >
-                <FaLinkedin size={20} />
+                <div className="relative">
+                    <FaLinkedin size={20} />
+                    {!isPro && <span className="absolute -top-1 -right-1 text-[8px]">🔒</span>}
+                </div>
             </button>
             <button
                 onClick={handleX}
-                className="opacity-60 hover:opacity-100 text-[#999] hover:text-[#1DA1F2] transition-all"
-                title="Share to X"
+                className={`opacity-60 hover:opacity-100 transition-all ${isPro ? 'text-[#1DA1F2]' : 'text-gray-400'}`}
+                title={isPro ? "Share to X" : "Upgrade to Share"}
             >
-                <FaXTwitter size={20} />
+                <div className="relative">
+                    <FaXTwitter size={20} />
+                    {!isPro && <span className="absolute -top-1 -right-1 text-[8px]">🔒</span>}
+                </div>
             </button>
             <button
                 onClick={handleWhatsApp}
-                className="opacity-60 hover:opacity-100 text-[#999] hover:text-[#25D366] transition-all"
-                title="Share to WhatsApp"
+                className={`opacity-60 hover:opacity-100 transition-all ${isPro ? 'text-[#25D366]' : 'text-gray-400'}`}
+                title={isPro ? "Share to WhatsApp" : "Upgrade to Share"}
             >
-                <FaWhatsapp size={20} />
+                <div className="relative">
+                    <FaWhatsapp size={20} />
+                    {!isPro && <span className="absolute -top-1 -right-1 text-[8px]">🔒</span>}
+                </div>
             </button>
             <button
                 onClick={handleCopy}

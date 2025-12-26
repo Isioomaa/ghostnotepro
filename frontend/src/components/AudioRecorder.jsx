@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { hasReachedLimit, incrementUsageCount } from '../utils/usageTracker';
+import { getUsageCount, incrementUsageCount, LIMIT } from '../utils/usageTracker';
 import { transcribeAudio } from '../services/gemini';
 import PaywallModal from './PaywallModal';
 
@@ -20,7 +20,7 @@ const SYNTHESIS_STEPS = [
     'Formatting final strategy...'
 ];
 
-const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
+const AudioRecorder = ({ onUploadSuccess, t, languageName, isPro }) => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -90,7 +90,8 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
 
     const startRecording = async () => {
         // Check usage limit before allowing recording
-        if (hasReachedLimit()) {
+        const hasReachedLimit = !isPro && getUsageCount() >= LIMIT;
+        if (hasReachedLimit) {
             setShowPaywall(true);
             return;
         }
@@ -148,7 +149,8 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName }) => {
 
     const handleUpload = async () => {
         // Check usage limit before processing
-        if (hasReachedLimit()) {
+        const hasReachedLimit = !isPro && getUsageCount() >= LIMIT;
+        if (hasReachedLimit) {
             setShowPaywall(true);
             return;
         }

@@ -1,6 +1,8 @@
 const USAGE_COUNT_KEY = 'ghostnote_usage_count';
 const PRO_STATUS_KEY = 'ghostnote_is_pro';
-const LIMIT = 3;
+export const LIMIT = 3;
+
+export const PRO_STATUS_CHANGED_EVENT = 'ghostnote-pro-changed';
 
 // Usage Count Management
 export const getUsageCount = () => {
@@ -25,6 +27,7 @@ export const isPro = () => {
 
 export const setPro = (value) => {
     localStorage.setItem(PRO_STATUS_KEY, value.toString());
+    window.dispatchEvent(new CustomEvent(PRO_STATUS_CHANGED_EVENT, { detail: { isPro: value } }));
 };
 
 // Limit Check (Rule of 3)
