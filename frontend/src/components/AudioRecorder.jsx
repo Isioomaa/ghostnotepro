@@ -21,6 +21,9 @@ const SYNTHESIS_STEPS = [
 ];
 
 const AudioRecorder = ({ onUploadSuccess, t, languageName, isPro }) => {
+    // Robust Boolean Check (Handles String/Boolean from Props)
+    const isProActive = String(isPro) === 'true' || isPro === true;
+
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -89,8 +92,10 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName, isPro }) => {
     };
 
     const startRecording = async () => {
-        // Check usage limit before allowing recording
-        const hasReachedLimit = !isPro && getUsageCount() >= LIMIT;
+        // 1. Correct Condition: Check usage limit AND Pro status
+        const usageCount = getUsageCount();
+        const hasReachedLimit = usageCount >= LIMIT && !isProActive;
+
         if (hasReachedLimit) {
             setShowPaywall(true);
             return;
@@ -148,8 +153,10 @@ const AudioRecorder = ({ onUploadSuccess, t, languageName, isPro }) => {
     };
 
     const handleUpload = async () => {
-        // Check usage limit before processing
-        const hasReachedLimit = !isPro && getUsageCount() >= LIMIT;
+        // 1. Correct Condition: Check usage limit AND Pro status
+        const usageCount = getUsageCount();
+        const hasReachedLimit = usageCount >= LIMIT && !isProActive;
+
         if (hasReachedLimit) {
             setShowPaywall(true);
             return;

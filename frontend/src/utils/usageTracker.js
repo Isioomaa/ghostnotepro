@@ -22,7 +22,8 @@ export const resetUsageCount = () => {
 // Pro Status Management
 export const isPro = () => {
     const proStatus = localStorage.getItem(PRO_STATUS_KEY);
-    return proStatus === 'true';
+    const legacyProStatus = localStorage.getItem('isPro'); // Fallback for manual user override
+    return proStatus === 'true' || legacyProStatus === 'true';
 };
 
 export const setPro = (value) => {
