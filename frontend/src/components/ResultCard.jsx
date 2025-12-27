@@ -7,7 +7,7 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [activeTab, setActiveTab] = useState('synthesis');
+    const [activeTab, setActiveTab] = useState('scribe');
     const [showPaywall, setShowPaywall] = useState(false);
 
     const handleGenerate = async () => {
@@ -60,31 +60,48 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
 
     // Results View
     const tabs = [
-        { id: 'synthesis', label: 'Synthesis' },
-        { id: 'strategic', label: 'Strategic' },
-        { id: 'tactical', label: 'Tactical' }
+        { id: 'scribe', label: 'The Scribe (Free)' },
+        { id: 'strategist', label: 'The Strategist (Pro)' }
     ];
 
-    // Map new data to tabs
     const getTabContent = (id) => {
         if (!data) return "Initializing...";
-        if (id === 'synthesis') {
+
+        if (id === 'scribe') {
+            const { free_tier } = data;
             return (
-                <div className="space-y-8">
+                <div className="space-y-12 animate-in fade-in duration-700">
                     <div>
-                        <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Executive Summary</h4>
-                        <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
-                            {data.executive_summary}
+                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Core Thesis</h4>
+                        <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed italic text-xl">
+                            "{free_tier.core_thesis}"
                         </div>
                     </div>
-                    {data.key_points && data.key_points.length > 0 && (
+
+                    {free_tier.strategic_pillars && free_tier.strategic_pillars.length > 0 && (
                         <div>
-                            <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Key Points</h4>
-                            <ul className="space-y-3">
-                                {data.key_points.map((point, idx) => (
-                                    <li key={idx} className="flex items-start text-[#1A1A1A] text-base font-sans leading-relaxed">
-                                        <span className="mr-3 text-[#A88E65]">•</span>
-                                        {point}
+                            <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Strategic Pillars</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {free_tier.strategic_pillars.map((pillar, idx) => (
+                                    <div key={idx} className="border-l border-[#A88E65]/20 pl-6 py-2">
+                                        <h5 className="font-sans font-bold text-[#1A1A1A] text-sm uppercase tracking-wider mb-2">{pillar.title}</h5>
+                                        <p className="text-gray-600 text-sm leading-relaxed">{pillar.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {free_tier.tactical_steps && free_tier.tactical_steps.length > 0 && (
+                        <div>
+                            <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Tactical Steps</h4>
+                            <ul className="space-y-4">
+                                {free_tier.tactical_steps.map((step, idx) => (
+                                    <li key={idx} className="flex items-start text-[#1A1A1A] text-sm font-sans group">
+                                        <span className="mr-4 w-6 h-6 rounded-full bg-[#A88E65]/5 flex items-center justify-center text-[#A88E65] text-[10px] font-bold border border-[#A88E65]/10 group-hover:bg-[#A88E65] group-hover:text-white transition-all">
+                                            {idx + 1}
+                                        </span>
+                                        <span className="flex-1 pt-0.5">{step}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -93,22 +110,73 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                 </div>
             );
         }
-        if (id === 'strategic') {
+
+        if (id === 'strategist') {
+            const { pro_tier } = data;
+
             return (
-                <div>
-                    <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Strategic Interpretation</h4>
-                    <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
-                        {data.strategic_interpretation}
-                    </div>
-                </div>
-            );
-        }
-        if (id === 'tactical') {
-            return (
-                <div>
-                    <h4 className="text-[#A88E65] text-xs uppercase tracking-[0.2em] font-bold mb-4">Action Direction</h4>
-                    <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">
-                        {data.action_direction}
+                <div className="relative">
+                    {/* Locked State for Free Users */}
+                    {!isPro && (
+                        <div className="absolute inset-x-0 -top-4 -bottom-4 z-20 flex flex-col items-center justify-center bg-white/40 backdrop-blur-md rounded-xl p-8 text-center border border-[#A88E65]/10 shadow-2xl">
+                            <div className="w-16 h-16 rounded-full bg-[#1A1A1A] flex items-center justify-center mb-6 shadow-xl">
+                                <span className="text-2xl">🔒</span>
+                            </div>
+                            <h3 className="font-serif text-2xl text-[#1A1A1A] mb-4">Unlock The Strategist</h3>
+                            <p className="text-gray-600 text-sm max-w-xs mb-8 leading-relaxed">
+                                Get executive-grade judgment, recursive risk audits, and ready-to-send execution assets.
+                            </p>
+                            <button
+                                onClick={() => setShowPaywall(true)}
+                                className="bg-[#A88E65] text-[#1A1A1A] px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-[#8F7650] transition-all transform hover:scale-105"
+                            >
+                                Upgrade to Pro
+                            </button>
+                        </div>
+                    )}
+
+                    <div className={`space-y-12 transition-all duration-700 ${!isPro ? 'blur-md select-none opacity-40 grayscale-[0.5]' : 'animate-in fade-in'}`}>
+                        <div className="bg-[#1A1A1A] text-white p-8 md:p-12 rounded-sm border border-[#A88E65]/30 shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-10">
+                                <svg className="w-24 h-24 text-[#A88E65]" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                                </svg>
+                            </div>
+                            <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-8">Executive Judgement</h4>
+                            <div className="font-serif text-2xl md:text-3xl leading-snug text-white/95 mb-4">
+                                {pro_tier.executive_judgement}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 className="text-red-900/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Risk Audit (The Blind Spot)</h4>
+                            <div className="bg-red-50/50 border border-red-100 p-8 rounded-sm text-red-900 text-base font-serif italic leading-relaxed">
+                                {pro_tier.risk_audit}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div>
+                                <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Execution Asset: Email</h4>
+                                <div className="border border-gray-100 p-6 rounded-sm bg-gray-50/50">
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Subject</p>
+                                    <p className="font-sans font-bold text-[#1A1A1A] text-sm mb-4">{pro_tier.email_draft.subject}</p>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Body</p>
+                                    <p className="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed">{pro_tier.email_draft.body}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">30-Day Action Plan</h4>
+                                <div className="space-y-4">
+                                    {pro_tier.action_plan.map((item, idx) => (
+                                        <div key={idx} className="flex items-center space-x-3 text-sm text-[#1A1A1A] border-b border-gray-50 pb-3">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-[#A88E65]"></div>
+                                            <span>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -116,26 +184,26 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
         return "No content available.";
     };
 
-    // Helper to get text for sharing
     const getTextToShare = () => {
         if (!data) return "";
-        if (activeTab === 'synthesis') {
-            const summary = data.executive_summary || "";
-            const bullets = (data.key_points || []).join('\n');
-            return `${summary}\n\n${bullets}`.trim();
+        if (activeTab === 'scribe') {
+            const { free_tier } = data;
+            return `TRANSCRIPT SYNTHESIS: ${free_tier.core_thesis}\n\nNEXT STEPS:\n${(free_tier.tactical_steps || []).map(s => `- ${s}`).join('\n')}`;
         }
-        if (activeTab === 'strategic') return data.strategic_interpretation || "";
-        if (activeTab === 'tactical') return data.action_direction || "";
+        if (activeTab === 'strategist' && isPro) {
+            const { pro_tier } = data;
+            return `EXECUTIVE JUDGEMENT: ${pro_tier.executive_judgement}\n\nRISK AUDIT: ${pro_tier.risk_audit}`;
+        }
         return "";
     };
 
     return (
         <div className="card-container fade-in">
-            {/* New Session Button and Confidence Badge */}
-            <div className="mb-6 flex justify-between items-center">
+            {/* New Session Button */}
+            <div className="mb-8 flex justify-between items-center px-4">
                 <button
                     onClick={onReset}
-                    className="flex items-center space-x-2 text-[#999] hover:text-[#F9F7F5] transition-colors text-sm"
+                    className="flex items-center space-x-2 text-[#999] hover:text-[#A88E65] transition-all text-[11px] uppercase tracking-[0.2em]"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -143,126 +211,37 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                     <span>New Session</span>
                 </button>
 
-                {/* Confidence Badge */}
-                {data.confidence_analysis && (
-                    <div className="relative group">
-                        {isPro ? (
-                            // Pro users see actual confidence badge
-                            data.confidence_analysis.level === 'High' ? (
-                                <div className="flex items-center space-x-2 bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded-full text-xs font-medium">
-                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                    <span>High Confidence</span>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="flex items-center space-x-2 bg-yellow-50 border border-yellow-300 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-medium cursor-help">
-                                        <span>⚠️</span>
-                                        <span>Potential Ambiguity</span>
-                                    </div>
-                                    {data.confidence_analysis.clarification_question && (
-                                        <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs p-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                            <p className="font-semibold mb-1">Clarification Needed:</p>
-                                            <p>{data.confidence_analysis.clarification_question}</p>
-                                            {data.confidence_analysis.reason && (
-                                                <p className="mt-2 text-gray-300 italic text-[10px]">Reason: {data.confidence_analysis.reason}</p>
-                                            )}
-                                        </div>
-                                    )}
-                                </>
-                            )
-                        ) : (
-                            // Free users see locked badge
-                            <div
-                                onClick={() => setShowPaywall(true)}
-                                className="flex items-center space-x-2 bg-gray-100 border border-gray-300 text-gray-500 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer hover:bg-gray-200 transition-colors"
-                            >
-                                <span>🔒</span>
-                                <span>Confidence Analysis</span>
-                            </div>
-                        )}
-                    </div>
-                )}
+                <div className="text-[11px] uppercase tracking-[0.2em] text-[#A88E65] font-bold">
+                    {isPro ? "Executive Status: Pro" : "Executive Status: Standard"}
+                </div>
             </div>
 
             {/* The Main Card */}
-            <div className="bg-white w-full max-w-3xl mx-auto rounded-sm shadow-[0_20px_40px_-15px_rgba(168,142,101,0.1)] overflow-hidden">
-
-
-                {/* Confidence Signal - AI Interpretation */}
-                {data.interpreted_context && (
-                    <div className="relative overflow-hidden">
-                        <div className={`bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-8 py-4 transition-all duration-500 ${!isPro ? 'blur-sm select-none grayscale-[0.5]' : ''}`}>
-                            <div className="flex items-start space-x-3">
-                                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <div className="flex-1">
-                                    <p className="text-green-800 text-xs uppercase tracking-widest font-semibold mb-1">Context Detected</p>
-                                    <p className="text-green-900 text-sm font-sans leading-relaxed">{data.interpreted_context}</p>
-
-                                    {/* Transparency - Collapsible Thought Trace */}
-                                    {data.thought_trace && data.thought_trace.length > 0 && (
-                                        <details className="mt-3 group">
-                                            <summary className="cursor-pointer text-xs text-gray-500 hover:text-gray-700 transition-colors list-none flex items-center space-x-1">
-                                                <span className="group-open:rotate-90 transition-transform inline-block">▸</span>
-                                                <span>✨ View detected key concepts</span>
-                                            </summary>
-                                            <div className="mt-2 flex flex-wrap gap-2">
-                                                {data.thought_trace.map((concept, idx) => (
-                                                    <span
-                                                        key={idx}
-                                                        className="inline-block bg-white border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded-full"
-                                                    >
-                                                        {concept}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </details>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Lock Overlay for Free Users */}
-                        {!isPro && (
-                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-transparent backdrop-blur-[1px]">
-                                <button
-                                    onClick={() => setShowPaywall(true)}
-                                    className="bg-[#1A1A1A]/80 border border-[#A88E65]/30 px-4 py-2 rounded-full flex items-center space-x-2 shadow-xl hover:bg-[#1A1A1A] transition-all transform hover:scale-105 active:scale-95"
-                                >
-                                    <span className="text-[#A88E65] text-xs">🔒</span>
-                                    <span className="text-white text-[10px] font-medium tracking-wide uppercase">Upgrade to unlock executive confidence analysis</span>
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                )}
-
+            <div className="bg-white w-full max-w-4xl mx-auto rounded-sm shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden border border-gray-100">
 
                 {/* Tab Bar */}
-                <div className="flex border-b border-gray-100 flex-wrap">
+                <div className="flex border-b border-gray-50 bg-gray-50/30">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 py-4 text-sm font-medium uppercase tracking-widest transition-all ${activeTab === tab.id
-                                ? 'bg-[#F9F7F5] text-[#A88E65] border-b-2 border-[#A88E65]'
-                                : 'bg-white text-[#999] hover:text-[#1A1A1A]'
+                            className={`flex-1 py-6 text-[11px] font-bold uppercase tracking-[0.3em] transition-all relative ${activeTab === tab.id
+                                ? 'text-[#1A1A1A] bg-white'
+                                : 'text-gray-400 hover:text-gray-600 bg-transparent'
                                 }`}
                         >
                             {tab.label}
+                            {activeTab === tab.id && (
+                                <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#A88E65]"></div>
+                            )}
                         </button>
                     ))}
                 </div>
 
                 {/* Content Area */}
-                <div className="p-10 md:p-14 min-h-[400px] bg-white">
+                <div className="p-10 md:p-20 min-h-[500px] bg-white">
                     {getTabContent(activeTab)}
                 </div>
-
-
             </div>
 
             {/* Share Actions */}
