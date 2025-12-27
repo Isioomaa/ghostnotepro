@@ -67,22 +67,33 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
     const getTabContent = (id) => {
         if (!data) return "Initializing...";
 
+        // Defensive mapping: handle both structured and flat responses
+        const freeData = data.free_tier || (data.core_thesis ? data : null);
+        const proData = data.pro_tier || (data.executive_judgement ? data : null);
+
         if (id === 'scribe') {
-            const { free_tier } = data;
+            if (!freeData) return (
+                <div className="flex flex-col items-center justify-center p-12 text-gray-400 italic">
+                    <p>The Scribe is refining your thoughts. Please wait or try generating again.</p>
+                </div>
+            );
+
             return (
                 <div className="space-y-12 animate-in fade-in duration-700">
-                    <div>
-                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Core Thesis</h4>
-                        <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed italic text-xl">
-                            "{free_tier.core_thesis}"
+                    {freeData.core_thesis && (
+                        <div>
+                            <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Core Thesis</h4>
+                            <div className="prose prose-lg max-w-none font-serif text-[#1A1A1A] leading-relaxed italic text-xl">
+                                "{freeData.core_thesis}"
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    {free_tier.strategic_pillars && free_tier.strategic_pillars.length > 0 && (
+                    {freeData.strategic_pillars && freeData.strategic_pillars.length > 0 && (
                         <div>
                             <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Strategic Pillars</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {free_tier.strategic_pillars.map((pillar, idx) => (
+                                {freeData.strategic_pillars.map((pillar, idx) => (
                                     <div key={idx} className="border-l border-[#A88E65]/20 pl-6 py-2">
                                         <h5 className="font-sans font-bold text-[#1A1A1A] text-sm uppercase tracking-wider mb-2">{pillar.title}</h5>
                                         <p className="text-gray-600 text-sm leading-relaxed">{pillar.description}</p>
@@ -92,11 +103,11 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                         </div>
                     )}
 
-                    {free_tier.tactical_steps && free_tier.tactical_steps.length > 0 && (
+                    {freeData.tactical_steps && freeData.tactical_steps.length > 0 && (
                         <div>
                             <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Tactical Steps</h4>
                             <ul className="space-y-4">
-                                {free_tier.tactical_steps.map((step, idx) => (
+                                {freeData.tactical_steps.map((step, idx) => (
                                     <li key={idx} className="flex items-start text-[#1A1A1A] text-sm font-sans group">
                                         <span className="mr-4 w-6 h-6 rounded-full bg-[#A88E65]/5 flex items-center justify-center text-[#A88E65] text-[10px] font-bold border border-[#A88E65]/10 group-hover:bg-[#A88E65] group-hover:text-white transition-all">
                                             {idx + 1}
@@ -112,8 +123,6 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
         }
 
         if (id === 'strategist') {
-            const { pro_tier } = data;
-
             return (
                 <div className="relative">
                     {/* Locked State for Free Users */}
@@ -135,49 +144,63 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                         </div>
                     )}
 
-                    <div className={`space-y-12 transition-all duration-700 ${!isPro ? 'blur-md select-none opacity-40 grayscale-[0.5]' : 'animate-in fade-in'}`}>
-                        <div className="bg-[#1A1A1A] text-white p-8 md:p-12 rounded-sm border border-[#A88E65]/30 shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-6 opacity-10">
-                                <svg className="w-24 h-24 text-[#A88E65]" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
-                                </svg>
-                            </div>
-                            <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-8">Executive Judgement</h4>
-                            <div className="font-serif text-2xl md:text-3xl leading-snug text-white/95 mb-4">
-                                {pro_tier.executive_judgement}
-                            </div>
+                    {!proData ? (
+                        <div className="flex flex-col items-center justify-center p-12 text-gray-400 italic">
+                            <p>The Strategist is analyzing risks. This requires executive status.</p>
                         </div>
-
-                        <div>
-                            <h4 className="text-red-900/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Risk Audit (The Blind Spot)</h4>
-                            <div className="bg-red-50/50 border border-red-100 p-8 rounded-sm text-red-900 text-base font-serif italic leading-relaxed">
-                                {pro_tier.risk_audit}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                            <div>
-                                <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Execution Asset: Email</h4>
-                                <div className="border border-gray-100 p-6 rounded-sm bg-gray-50/50">
-                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Subject</p>
-                                    <p className="font-sans font-bold text-[#1A1A1A] text-sm mb-4">{pro_tier.email_draft.subject}</p>
-                                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Body</p>
-                                    <p className="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed">{pro_tier.email_draft.body}</p>
+                    ) : (
+                        <div className={`space-y-12 transition-all duration-700 ${!isPro ? 'blur-md select-none opacity-40 grayscale-[0.5]' : 'animate-in fade-in'}`}>
+                            {proData.executive_judgement && (
+                                <div className="bg-[#1A1A1A] text-white p-8 md:p-12 rounded-sm border border-[#A88E65]/30 shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-6 opacity-10">
+                                        <svg className="w-24 h-24 text-[#A88E65]" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                                        </svg>
+                                    </div>
+                                    <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-8">Executive Judgement</h4>
+                                    <div className="font-serif text-2xl md:text-3xl leading-snug text-white/95 mb-4">
+                                        {proData.executive_judgement}
+                                    </div>
                                 </div>
-                            </div>
-                            <div>
-                                <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">30-Day Action Plan</h4>
-                                <div className="space-y-4">
-                                    {pro_tier.action_plan.map((item, idx) => (
-                                        <div key={idx} className="flex items-center space-x-3 text-sm text-[#1A1A1A] border-b border-gray-50 pb-3">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-[#A88E65]"></div>
-                                            <span>{item}</span>
+                            )}
+
+                            {proData.risk_audit && (
+                                <div>
+                                    <h4 className="text-red-900/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Risk Audit (The Blind Spot)</h4>
+                                    <div className="bg-red-50/50 border border-red-100 p-8 rounded-sm text-red-900 text-base font-serif italic leading-relaxed">
+                                        {proData.risk_audit}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                {proData.email_draft && (
+                                    <div>
+                                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Execution Asset: Email</h4>
+                                        <div className="border border-gray-100 p-6 rounded-sm bg-gray-50/50">
+                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Subject</p>
+                                            <p className="font-sans font-bold text-[#1A1A1A] text-sm mb-4">{proData.email_draft.subject}</p>
+                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Body</p>
+                                            <p className="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed">{proData.email_draft.body}</p>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                )}
+                                {proData.action_plan && proData.action_plan.length > 0 && (
+                                    <div>
+                                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">30-Day Action Plan</h4>
+                                        <div className="space-y-4">
+                                            {proData.action_plan.map((item, idx) => (
+                                                <div key={idx} className="flex items-center space-x-3 text-sm text-[#1A1A1A] border-b border-gray-50 pb-3">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#A88E65]"></div>
+                                                    <span>{item}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             );
         }
@@ -186,13 +209,14 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
 
     const getTextToShare = () => {
         if (!data) return "";
-        if (activeTab === 'scribe') {
-            const { free_tier } = data;
-            return `TRANSCRIPT SYNTHESIS: ${free_tier.core_thesis}\n\nNEXT STEPS:\n${(free_tier.tactical_steps || []).map(s => `- ${s}`).join('\n')}`;
+        const freeData = data.free_tier || (data.core_thesis ? data : null);
+        const proData = data.pro_tier || (data.executive_judgement ? data : null);
+
+        if (activeTab === 'scribe' && freeData) {
+            return `TRANSCRIPT SYNTHESIS: ${freeData.core_thesis}\n\nNEXT STEPS:\n${(freeData.tactical_steps || []).map(s => `- ${s}`).join('\n')}`;
         }
-        if (activeTab === 'strategist' && isPro) {
-            const { pro_tier } = data;
-            return `EXECUTIVE JUDGEMENT: ${pro_tier.executive_judgement}\n\nRISK AUDIT: ${pro_tier.risk_audit}`;
+        if (activeTab === 'strategist' && isPro && proData) {
+            return `EXECUTIVE JUDGEMENT: ${proData.executive_judgement}\n\nRISK AUDIT: ${proData.risk_audit}`;
         }
         return "";
     };
