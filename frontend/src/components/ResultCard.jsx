@@ -120,11 +120,13 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                     {freeData.strategic_pillars && freeData.strategic_pillars.length > 0 && (
                         <div>
                             <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6 opacity-60">Strategic Pillars</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-12">
                                 {freeData.strategic_pillars.map((pillar, idx) => (
-                                    <div key={idx} className="border-l border-[#A88E65]/20 pl-6 py-2">
-                                        <h5 className="font-sans font-bold text-[#1A1A1A] text-sm uppercase tracking-wider mb-2">{pillar.title}</h5>
-                                        <p className="text-gray-600 text-sm leading-relaxed">{pillar.description}</p>
+                                    <div key={idx} className="border-l-2 border-[#A88E65]/20 pl-8 py-2">
+                                        <h5 className="font-sans font-bold text-[#1A1A1A] text-lg uppercase tracking-wider mb-4 leading-tight">{pillar.title}</h5>
+                                        <p className="text-gray-600 text-base leading-loose max-w-2xl font-serif">
+                                            {pillar.rich_description || pillar.description}
+                                        </p>
                                     </div>
                                 ))}
                             </div>
@@ -281,7 +283,8 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
         const proData = data.pro_tier || (data.executive_judgement ? data : null);
 
         if (activeTab === 'scribe' && freeData) {
-            return `TRANSCRIPT SYNTHESIS: ${freeData.core_thesis}\n\nNEXT STEPS:\n${(freeData.tactical_steps || []).map(s => `- ${s}`).join('\n')}`;
+            const pillarsText = (freeData.strategic_pillars || []).map(p => `${p.title}\n${p.rich_description || p.description}`).join('\n\n');
+            return `TRANSCRIPT SYNTHESIS: ${freeData.core_thesis}\n\nSTRATEGIC PILLARS:\n${pillarsText}\n\nNEXT STEPS:\n${(freeData.tactical_steps || []).map(s => `- ${s}`).join('\n')}`;
         }
         if (activeTab === 'strategist' && isPro && proData) {
             return `EXECUTIVE JUDGEMENT: ${proData.executive_judgement}\n\nRISK AUDIT: ${proData.risk_audit}`;
