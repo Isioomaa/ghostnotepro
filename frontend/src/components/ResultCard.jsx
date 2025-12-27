@@ -236,35 +236,49 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
 
                                 {/* Collapsible Content */}
                                 <div className="mt-8 space-y-6">
-                                    {showEmail && proData.email_draft && (
+                                    {showEmail && (proData.execution_assets?.email_draft || proData.email_draft) && (
                                         <div className="animate-in slide-in-from-top-4 duration-500 border border-[#A88E65]/20 p-8 bg-white shadow-xl">
-                                            <div className="flex justify-between items-baseline mb-6 border-b border-gray-50 pb-4">
-                                                <h5 className="text-[10px] uppercase tracking-widest font-bold text-[#A88E65]">Drafted Communication</h5>
-                                                <button onClick={() => setShowEmail(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
-                                            </div>
-                                            <div className="space-y-4">
-                                                <p className="text-[10px] uppercase tracking-widest text-gray-400">Subject</p>
-                                                <p className="font-sans font-bold text-[#1A1A1A] text-lg">{proData.email_draft.subject}</p>
-                                                <p className="text-[10px] uppercase tracking-widest text-gray-400 mt-6">Message Body</p>
-                                                <p className="text-gray-700 text-base whitespace-pre-wrap leading-relaxed font-serif italic">{proData.email_draft.body}</p>
-                                            </div>
+                                            {(() => {
+                                                const email = proData.execution_assets?.email_draft || proData.email_draft;
+                                                return (
+                                                    <>
+                                                        <div className="flex justify-between items-baseline mb-6 border-b border-gray-50 pb-4">
+                                                            <h5 className="text-[10px] uppercase tracking-widest font-bold text-[#A88E65]">Drafted Communication</h5>
+                                                            <button onClick={() => setShowEmail(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
+                                                        </div>
+                                                        <div className="space-y-4">
+                                                            <p className="text-[10px] uppercase tracking-widest text-gray-400">Subject</p>
+                                                            <p className="font-sans font-bold text-[#1A1A1A] text-lg">{email.subject}</p>
+                                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 mt-6">Message Body</p>
+                                                            <p className="text-gray-700 text-base whitespace-pre-wrap leading-relaxed font-serif italic">{email.body}</p>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     )}
 
-                                    {showActionPlan && proData.action_plan && (
+                                    {showActionPlan && (proData.execution_assets?.action_plan || proData.action_plan) && (
                                         <div className="animate-in slide-in-from-top-4 duration-500 border border-[#A88E65]/20 p-8 bg-white shadow-xl">
-                                            <div className="flex justify-between items-baseline mb-8 border-b border-gray-50 pb-4">
-                                                <h5 className="text-[10px] uppercase tracking-widest font-bold text-[#A88E65]">Strategic Roadmap</h5>
-                                                <button onClick={() => setShowActionPlan(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
-                                            </div>
-                                            <div className="space-y-6">
-                                                {proData.action_plan.map((item, idx) => (
-                                                    <div key={idx} className="flex items-start space-x-4 border-b border-gray-50 pb-4 last:border-0">
-                                                        <span className="text-[10px] font-bold text-[#A88E65] w-8">0{idx + 1}</span>
-                                                        <span className="text-sm text-[#1A1A1A] font-sans leading-relaxed pt-0.5">{item}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                            {(() => {
+                                                const roadmap = proData.execution_assets?.action_plan || proData.action_plan;
+                                                return (
+                                                    <>
+                                                        <div className="flex justify-between items-baseline mb-8 border-b border-gray-50 pb-4">
+                                                            <h5 className="text-[10px] uppercase tracking-widest font-bold text-[#A88E65]">Strategic Roadmap</h5>
+                                                            <button onClick={() => setShowActionPlan(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
+                                                        </div>
+                                                        <div className="space-y-6">
+                                                            {roadmap.map((item, idx) => (
+                                                                <div key={idx} className="flex items-start space-x-4 border-b border-gray-50 pb-4 last:border-0">
+                                                                    <span className="text-[10px] font-bold text-[#A88E65] w-8">0{idx + 1}</span>
+                                                                    <span className="text-sm text-[#1A1A1A] font-sans leading-relaxed pt-0.5">{item}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                 </div>
