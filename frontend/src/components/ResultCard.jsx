@@ -9,6 +9,26 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('scribe');
     const [showPaywall, setShowPaywall] = useState(false);
+    const [loadingMessage, setLoadingMessage] = useState("Applying executive judgment...");
+    const [showEmail, setShowEmail] = useState(false);
+    const [showActionPlan, setShowActionPlan] = useState(false);
+
+    React.useEffect(() => {
+        let interval;
+        if (loading) {
+            const messages = [
+                "Applying executive judgment...",
+                "Analyzing risk vectors...",
+                "Operationalizing strategy..."
+            ];
+            let i = 0;
+            interval = setInterval(() => {
+                i = (i + 1) % messages.length;
+                setLoadingMessage(messages[i]);
+            }, 2000);
+        }
+        return () => clearInterval(interval);
+    }, [loading]);
 
     const handleGenerate = async () => {
         setLoading(true);
@@ -48,9 +68,9 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                     <button
                         onClick={handleGenerate}
                         disabled={loading}
-                        className="btn-transmute"
+                        className="btn-transmute min-w-[280px]"
                     >
-                        {loading ? 'TRANSMUTING...' : 'GENERATE EXECUTIVE SUITE'}
+                        {loading ? loadingMessage.toUpperCase() : 'GENERATE EXECUTIVE SUITE'}
                     </button>
                     {error && <p className="mt-4 text-red-500 text-sm">{error}</p>}
                 </div>
@@ -60,8 +80,16 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
 
     // Results View
     const tabs = [
-        { id: 'scribe', label: 'The Scribe (Free)' },
-        { id: 'strategist', label: 'The Strategist (Pro)' }
+        {
+            id: 'scribe',
+            label: 'The Scribe',
+            subtext: 'Refines and clarifies your thoughts into structured, articulate content.'
+        },
+        {
+            id: 'strategist',
+            label: 'The Strategist',
+            subtext: 'Applies executive reasoning to challenge, deepen, and operationalize your thinking.'
+        }
     ];
 
     const getTabContent = (id) => {
@@ -149,55 +177,95 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                             <p>The Strategist is analyzing risks. This requires executive status.</p>
                         </div>
                     ) : (
-                        <div className={`space-y-12 transition-all duration-700 ${!isPro ? 'blur-md select-none opacity-40 grayscale-[0.5]' : 'animate-in fade-in'}`}>
-                            {proData.executive_judgement && (
-                                <div className="bg-[#1A1A1A] text-white p-8 md:p-12 rounded-sm border border-[#A88E65]/30 shadow-2xl relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 p-6 opacity-10">
-                                        <svg className="w-24 h-24 text-[#A88E65]" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
-                                        </svg>
-                                    </div>
-                                    <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-8">Executive Judgement</h4>
-                                    <div className="font-serif text-2xl md:text-3xl leading-snug text-white/95 mb-4">
-                                        {proData.executive_judgement}
-                                    </div>
-                                </div>
-                            )}
-
-                            {proData.risk_audit && (
-                                <div>
-                                    <h4 className="text-red-900/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Risk Audit (The Blind Spot)</h4>
-                                    <div className="bg-red-50/50 border border-red-100 p-8 rounded-sm text-red-900 text-base font-serif italic leading-relaxed">
-                                        {proData.risk_audit}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                                {proData.email_draft && (
-                                    <div>
-                                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Execution Asset: Email</h4>
-                                        <div className="border border-gray-100 p-6 rounded-sm bg-gray-50/50">
-                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Subject</p>
-                                            <p className="font-sans font-bold text-[#1A1A1A] text-sm mb-4">{proData.email_draft.subject}</p>
-                                            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Body</p>
-                                            <p className="text-gray-600 text-sm whitespace-pre-wrap leading-relaxed">{proData.email_draft.body}</p>
+                        <div className={`transition-all duration-700 ${!isPro ? 'blur-md select-none opacity-40 grayscale-[0.5]' : 'animate-in fade-in'}`}>
+                            {/* Premium Content Area */}
+                            <div className="space-y-12 p-8 md:p-12 rounded-sm border border-[#A88E65]/10 bg-[#A88E65]/[0.02]">
+                                {proData.executive_judgement && (
+                                    <div className="bg-[#1A1A1A] text-white p-8 md:p-12 rounded-sm border border-[#A88E65]/30 shadow-2xl relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-6 opacity-10">
+                                            <svg className="w-24 h-24 text-[#A88E65]" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+                                            </svg>
+                                        </div>
+                                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-8">Executive Judgement</h4>
+                                        <div className="font-serif text-2xl md:text-3xl leading-snug text-white/95 mb-4">
+                                            {proData.executive_judgement}
                                         </div>
                                     </div>
                                 )}
-                                {proData.action_plan && proData.action_plan.length > 0 && (
+
+                                {proData.risk_audit && (
                                     <div>
-                                        <h4 className="text-[#A88E65] text-[10px] uppercase tracking-[0.3em] font-bold mb-6">30-Day Action Plan</h4>
-                                        <div className="space-y-4">
-                                            {proData.action_plan.map((item, idx) => (
-                                                <div key={idx} className="flex items-center space-x-3 text-sm text-[#1A1A1A] border-b border-gray-50 pb-3">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#A88E65]"></div>
-                                                    <span>{item}</span>
-                                                </div>
-                                            ))}
+                                        <h4 className="text-red-900/40 text-[10px] uppercase tracking-[0.3em] font-bold mb-6">Risk Audit (The Blind Spot)</h4>
+                                        <div className="bg-red-50/50 border border-red-100 p-8 rounded-sm text-red-900 text-base font-serif italic leading-relaxed">
+                                            {proData.risk_audit}
                                         </div>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Operationalize Section */}
+                            <div className="mt-16 pt-12 border-t border-gray-100">
+                                <h4 className="text-[#1A1A1A] text-[10px] uppercase tracking-[0.4em] font-bold mb-8 text-center opacity-40">Operationalize This Strategy</h4>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <button
+                                        onClick={() => setShowEmail(!showEmail)}
+                                        className={`p-6 border transition-all text-left group ${showEmail ? 'border-[#A88E65] bg-[#A88E65]/5' : 'border-gray-100 hover:border-[#A88E65]/30'}`}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#A88E65]">Executive Email</span>
+                                            <span className="text-xs opacity-40 group-hover:opacity-100 transition-opacity">{showEmail ? '−' : '+'}</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 font-serif italic">Review the persuasively drafted communication for your stakeholders.</p>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setShowActionPlan(!showActionPlan)}
+                                        className={`p-6 border transition-all text-left group ${showActionPlan ? 'border-[#A88E65] bg-[#A88E65]/5' : 'border-gray-100 hover:border-[#A88E65]/30'}`}
+                                    >
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#A88E65]">30-Day Action Plan</span>
+                                            <span className="text-xs opacity-40 group-hover:opacity-100 transition-opacity">{showActionPlan ? '−' : '+'}</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 font-serif italic">Operationalize the roadmap with specific owners and milestones.</p>
+                                    </button>
+                                </div>
+
+                                {/* Collapsible Content */}
+                                <div className="mt-8 space-y-6">
+                                    {showEmail && proData.email_draft && (
+                                        <div className="animate-in slide-in-from-top-4 duration-500 border border-[#A88E65]/20 p-8 bg-white shadow-xl">
+                                            <div className="flex justify-between items-baseline mb-6 border-b border-gray-50 pb-4">
+                                                <h5 className="text-[10px] uppercase tracking-widest font-bold text-[#A88E65]">Drafted Communication</h5>
+                                                <button onClick={() => setShowEmail(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <p className="text-[10px] uppercase tracking-widest text-gray-400">Subject</p>
+                                                <p className="font-sans font-bold text-[#1A1A1A] text-lg">{proData.email_draft.subject}</p>
+                                                <p className="text-[10px] uppercase tracking-widest text-gray-400 mt-6">Message Body</p>
+                                                <p className="text-gray-700 text-base whitespace-pre-wrap leading-relaxed font-serif italic">{proData.email_draft.body}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {showActionPlan && proData.action_plan && (
+                                        <div className="animate-in slide-in-from-top-4 duration-500 border border-[#A88E65]/20 p-8 bg-white shadow-xl">
+                                            <div className="flex justify-between items-baseline mb-8 border-b border-gray-50 pb-4">
+                                                <h5 className="text-[10px] uppercase tracking-widest font-bold text-[#A88E65]">Strategic Roadmap</h5>
+                                                <button onClick={() => setShowActionPlan(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
+                                            </div>
+                                            <div className="space-y-6">
+                                                {proData.action_plan.map((item, idx) => (
+                                                    <div key={idx} className="flex items-start space-x-4 border-b border-gray-50 pb-4 last:border-0">
+                                                        <span className="text-[10px] font-bold text-[#A88E65] w-8">0{idx + 1}</span>
+                                                        <span className="text-sm text-[#1A1A1A] font-sans leading-relaxed pt-0.5">{item}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -249,12 +317,17 @@ const ResultCard = ({ text, analysis, languageName, onReset, isPro }) => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 py-6 text-[11px] font-bold uppercase tracking-[0.3em] transition-all relative ${activeTab === tab.id
+                            className={`flex-1 py-8 px-4 text-center transition-all relative ${activeTab === tab.id
                                 ? 'text-[#1A1A1A] bg-white'
                                 : 'text-gray-400 hover:text-gray-600 bg-transparent'
                                 }`}
                         >
-                            {tab.label}
+                            <div className="text-[11px] font-bold uppercase tracking-[0.3em] mb-2">
+                                {tab.label}
+                            </div>
+                            <div className="text-[10px] text-gray-400 italic font-normal tracking-tight max-w-[220px] mx-auto leading-relaxed">
+                                {tab.subtext}
+                            </div>
                             {activeTab === tab.id && (
                                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#A88E65]"></div>
                             )}
