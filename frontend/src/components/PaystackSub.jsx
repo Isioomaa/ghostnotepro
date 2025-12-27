@@ -2,15 +2,18 @@ import React from 'react';
 import { usePaystackPayment } from 'react-paystack';
 import { setPro } from '../utils/usageTracker';
 
-const PaystackSub = ({ email, amount, currency, displayText, onSuccess, onClose }) => {
+const PaystackSub = ({ email, amount, currency, onSuccess, onClose }) => {
     // 1. Safety Fallbacks
     const safeEmail = email || "customer@example.com";
     const safeAmount = amount || 2000;
     const safeCurrency = currency || 'USD';
-    const safeDisplay = displayText || (safeCurrency === 'USD' ? '$20' : '₦30,000');
+
+    // Dynamic Button Text Logic
+    const buttonText = safeCurrency === 'USD'
+        ? "Continue with Membership ($20/mo)"
+        : "Continue with Membership (₦30,000/mo)";
 
     // Use a realistic-looking placeholder if the user hasn't set their key yet
-    // This prevents runtime crashes in some versions of the Paystack library
     const fallbackKey = "pk_test_000000000000000000000000000000000000000";
     const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || fallbackKey;
 
@@ -32,7 +35,7 @@ const PaystackSub = ({ email, amount, currency, displayText, onSuccess, onClose 
 
     const handlePayment = () => {
         if (!initializePayment) {
-            console.error("Paystack initialization failed - hook returned null/undefined");
+            console.error("Paystack initialization failed");
             alert("Payment system is temporarily unavailable. Please try again.");
             return;
         }
@@ -51,16 +54,16 @@ const PaystackSub = ({ email, amount, currency, displayText, onSuccess, onClose 
             );
         } catch (err) {
             console.error("Paystack Execution Error:", err);
-            alert("Could not open payment gateway. Please refresh the page.");
+            alert("Could not open payment gateway. Please refresh.");
         }
     };
 
     return (
         <button
             onClick={handlePayment}
-            className="w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-widest shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-xs uppercase"
+            className="w-full py-4 bg-[#A88E65] text-[#1A1A1A] font-bold tracking-widest shadow-lg shadow-[#A88E65]/20 hover:bg-[#8F7650] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-[10px] uppercase px-4"
         >
-            Upgrade Now ({safeDisplay})
+            {buttonText}
         </button>
     );
 };

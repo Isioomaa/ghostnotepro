@@ -1,51 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import PaystackSub from './PaystackSub';
 
 const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
-    // 1. Fail-Safe State Initialization
-    const [paymentConfig, setPaymentConfig] = useState({
-        amount: 2000,
-        currency: 'USD',
-        displayText: '$20/mo'
-    });
+    // 1. Initialize with Safe Defaults (Prevents Crash)
+    const [currency, setCurrency] = useState('USD');
+    const [amount, setAmount] = useState(2000); // $20.00 (2000 cents)
 
+    // 2. The "Lagos Check" (Inside useEffect)
     useEffect(() => {
         try {
-            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const isNigeria = userTimezone && (
-                userTimezone.toLowerCase().includes('lagos') ||
-                userTimezone.toLowerCase().includes('africa/lagos')
-            );
-
-            if (isNigeria) {
-                setPaymentConfig({
-                    amount: 3000000,
-                    currency: 'NGN',
-                    displayText: '₦30,000/mo'
-                });
-            } else {
-                setPaymentConfig({
-                    amount: 2000,
-                    currency: 'USD',
-                    displayText: '$20/mo'
-                });
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz && (tz.includes('Lagos') || tz.includes('Africa/Lagos'))) {
+                setCurrency('NGN');
+                setAmount(3000000); // 30,000 Naira (3 million kobo)
             }
-        } catch (err) {
-            console.error("Region detection error:", err);
+        } catch (e) {
+            console.log("Timezone check failed, defaulting to USD");
         }
     }, []);
 
-    return (
+    const modalContent = (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-sm cursor-pointer"
+                className="absolute inset-0 bg-[#0a0a0a]/95 backdrop-blur-md cursor-pointer"
                 onClick={onClose}
                 aria-hidden="true"
             ></div>
 
             {/* Modal Card - Premium Bronze/Gold Design */}
-            <div className="relative w-full max-w-lg bg-[#141414] border border-[#a88e65]/40 p-12 text-center shadow-[0_0_100px_rgba(0,0,0,0.9)]">
+            <div className="relative w-full max-w-lg bg-[#141414] border border-[#a88e65]/40 p-12 text-center shadow-[0_0_100px_rgba(0,0,0,0.9)] scale-in">
 
                 {/* Lock Icon in Bronze Circle */}
                 <div className="flex justify-center mb-10">
@@ -76,10 +61,12 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
                 {/* The Membership Button */}
                 <div className="space-y-10">
                     <PaystackSub
-                        amount={paymentConfig.amount}
-                        currency={paymentConfig.currency}
-                        displayText={paymentConfig.displayText}
-                        onSuccess={onClose}
+                        amount={amount}
+                        currency={currency}
+                        onSuccess={onSuccess => {
+                            console.log("Payment success:", onSuccess);
+                            onClose();
+                        }}
                         onClose={() => console.log("Paystack modal closed")}
                     />
 
@@ -100,6 +87,8 @@ const PaywallModal = ({ onClose, scenario = 'upsell' }) => {
             </div>
         </div>
     );
+
+    return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default PaywallModal;
