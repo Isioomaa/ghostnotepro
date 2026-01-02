@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+    --alabaster: #F9F7F5;
+    --bronze: #A88E65;
+    --charcoal: #f0f0f0;
+    --grey-600: #666666;
+    --grey-400: #cccccc;
+    /* Tactical Amber Theme */
+    --tactical-amber: #FF9F1C;
+    --deep-charcoal: #09090b;
+    --guillotine-red: #EF4444;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0a0a0a;
+    color: #f0f0f0;
+    min-height: 100vh;
+}
+
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+.text-bronze {
+    color: var(--bronze);
+}
+
+.border-bronze {
+    border-color: var(--bronze);
+}
+
+.text-grey-600 {
+    color: var(--grey-600);
+}
+
+.text-grey-400 {
+    color: var(--grey-400);
+}
+
+/* Minimal button styles */
+.btn-transmute {
+    color: var(--bronze);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-transmute:hover {
+    opacity: 0.7;
+}
+
+.btn-transmute:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Platform tag styles */
+.platform-tag {
+    color: var(--grey-400);
+    font-size: 0.875rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding-bottom: 2px;
+    border-bottom: 1px solid transparent;
+}
+
+.platform-tag.active {
+    color: var(--bronze);
+    border-bottom-color: var(--bronze);
+}
+
+.platform-tag:hover {
+    color: var(--bronze);
+}
+
+/* Mode toggle */
+.mode-link {
+    color: var(--grey-400);
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+.mode-link.active {
+    color: #f0f0f0;
+}
+
+.mode-link:hover {
+    color: #f0f0f0;
+}
+
+.luxury-glow {
+    box-shadow: 0 0 50px -12px rgba(212, 175, 55, 0.25);
+}
+
+.fade-in {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== TACTICAL AMBER THEME - "Dossier" Look ===== */
+
+/* Dossier Card - Bloomberg Terminal Aesthetic */
+.dossier-card {
+    background-color: var(--deep-charcoal);
+    border-top: 2px solid var(--tactical-amber);
+    border-radius: 0.5rem;
+    position: relative;
+}
+
+/* The Guillotine - Termination Section */
+.guillotine-card {
+    background-color: var(--deep-charcoal);
+    border-top: 2px solid var(--guillotine-red);
+    border-radius: 0.5rem;
+}
+
+.guillotine-card .text-accent {
+    color: var(--guillotine-red);
+}
+
+/* Pulsing Live Dot */
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--tactical-amber);
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse-amber 2s ease-in-out infinite;
+}
+
+@keyframes pulse-amber {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.7);
+    }
+
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 0 6px rgba(255, 159, 28, 0);
+    }
+}
+
+/* Skeleton Loader */
+.skeleton {
+    background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Tactical Amber accent class */
+.text-tactical-amber {
+    color: var(--tactical-amber);
+}
+
+.border-tactical-amber {
+    border-color: var(--tactical-amber);
+}
+
+.bg-tactical-amber {
+    background-color: var(--tactical-amber);
+}
